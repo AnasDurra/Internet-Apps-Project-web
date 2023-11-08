@@ -5,9 +5,9 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './routes/root.jsx';
 import ErrorPage from './error-page.jsx';
-import GroupsPage from './routes/groups/groups-page.jsx';
+import ViewAllGroups from './routes/groups/view-all-groups.jsx';
 import { ConfigProvider } from 'antd';
-import ViewGroup from './routes/groups/one-group-page.jsx';
+import ViewOneGroup from './routes/groups/view-one-group.jsx';
 
 const router = createBrowserRouter([
   {
@@ -17,11 +17,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: 'groups',
-        element: <GroupsPage />,
+        element: <ViewAllGroups />,
       },
       {
         path: 'groups/:group_name',
-        element: <ViewGroup />,
+        element: <ViewOneGroup />,
       },
     ],
   },

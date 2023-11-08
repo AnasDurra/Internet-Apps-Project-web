@@ -8,13 +8,16 @@ import {
   Space,
   Tag,
   message,
+  theme,
 } from 'antd';
 import Title from 'antd/es/typography/Title';
 import Typography from 'antd/es/typography/Typography';
 import Dragger from 'antd/es/upload/Dragger';
 import { BsPerson } from 'react-icons/bs';
+import { IoIosAdd, IoIosRemove } from 'react-icons/io';
 import { RiInboxArchiveFill } from 'react-icons/ri';
 import { TiUploadOutline } from 'react-icons/ti';
+const { useToken } = theme;
 
 const fileProps = {
   name: 'file',
@@ -37,6 +40,8 @@ const fileProps = {
 };
 
 export default function NewFileModal({ isOpen, setOpen }) {
+  const { token } = useToken();
+
   return (
     <Modal
       open={isOpen}
@@ -66,33 +71,40 @@ export default function NewFileModal({ isOpen, setOpen }) {
           People With Access
         </Title>
 
+        {/* //array */}
         <div style={{ margin: '1em 0' }}>
           <Row>
             <Col>
-              <BsPerson size={'1.2em'}></BsPerson>
+              <BsPerson
+                size={'1.8em'}
+                color={token.colorPrimary}
+              ></BsPerson>
             </Col>
-
             <Col
               offset={1}
               span={4}
+              style={{ marginBlock: 'auto' }}
             >
               <Typography.Text>@anas_rish</Typography.Text>
             </Col>
 
-            <Col span={4}>
-              <Select
-                style={{ width: '100%' }}
-                defaultValue='editor'
-                onChange={() => {}}
-                options={[
-                  { value: 'editor', label: 'Editor' },
-                  { value: 'viewer', label: 'Viewer' },
-                ]}
-              />
+            <Col
+              style={{ marginBlock: 'auto' }}
+              offset={2}
+            >
+              <Tag>New</Tag>
             </Col>
 
-            <Col offset={2}>
-              <Tag>Edited (to viewer)</Tag>
+            <Col
+              offset={2}
+              style={{ marginBlock: 'auto' }}
+            >
+              <a>
+                <IoIosRemove
+                  size={'1.5em'}
+                  color={token.colorPrimary}
+                ></IoIosRemove>
+              </a>
             </Col>
           </Row>
         </div>
@@ -100,47 +112,84 @@ export default function NewFileModal({ isOpen, setOpen }) {
         <div style={{ margin: '1em 0' }}>
           <Row>
             <Col>
-              <BsPerson size={'1.2em'}></BsPerson>
+              <BsPerson
+                color={token.colorPrimary}
+                size={'1.8em'}
+              ></BsPerson>
             </Col>
-
             <Col
               offset={1}
               span={4}
+              style={{ marginBlock: 'auto' }}
             >
               <Typography.Text>@alaa_zamel</Typography.Text>
             </Col>
 
-            <Col span={4}>
-              <Select
-                style={{ width: '100%' }}
-                defaultValue='editor'
-                onChange={() => {}}
-                options={[
-                  { value: 'editor', label: 'Editor' },
-                  { value: 'viewer', label: 'Viewer' },
-                ]}
-              />
+            <Col
+              offset={2}
+              style={{ marginBlock: 'auto' }}
+            >
+              <Tag>New</Tag>
+            </Col>
+            <Col
+              offset={2}
+              style={{ marginBlock: 'auto' }}
+            >
+              <a>
+                <IoIosRemove
+                  size={'1.5em'}
+                  color={token.colorPrimary}
+                ></IoIosRemove>
+              </a>
+            </Col>
+          </Row>
+        </div>
+
+        <Title
+          level={5}
+          style={{ margin: '1rem 0' }}
+        >
+          Removing Access From
+        </Title>
+        <div style={{ margin: '1em 0' }}>
+          <Row>
+            <Col>
+              <BsPerson
+                color={token.colorPrimary}
+                size={'1.8em'}
+              ></BsPerson>
+            </Col>
+            <Col
+              offset={1}
+              span={4}
+              style={{ marginBlock: 'auto' }}
+            >
+              <Typography.Text>@alaa_zamel</Typography.Text>
             </Col>
 
-            <Col offset={2}>
+            <Col
+              offset={2}
+              style={{ marginBlock: 'auto' }}
+            >
               <Tag>New</Tag>
+            </Col>
+            <Col
+              offset={2}
+              style={{ marginBlock: 'auto' }}
+            >
+              <a>
+                <IoIosAdd
+                  size={'1.4em'}
+                  color={token.colorPrimary}
+                ></IoIosAdd>
+              </a>
             </Col>
           </Row>
         </div>
 
         <Title level={5}> Add People</Title>
         <Space>
-          <Select
-            defaultValue='editor'
-            onChange={() => {}}
-            options={[
-              { value: 'editor', label: 'Editor' },
-              { value: 'viewer', label: 'Viewer' },
-            ]}
-          />
-
           <Input placeholder='Username'></Input>
-
           <Button>add</Button>
         </Space>
       </div>
