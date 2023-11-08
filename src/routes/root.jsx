@@ -4,22 +4,23 @@ import { Outlet } from 'react-router-dom';
 
 export default function Root() {
   return (
-    <Layout style={{ height: '100%' }}>
+    <Layout>
       <Header
         style={{
           display: 'flex',
           alignItems: 'center',
-          backgroundColor:'#5c0011'
+          backgroundColor: '#5c0011',
         }}
       />
 
       <Content
         style={{
-          padding: '2% 5%',
+          padding: '1% 5%',
         }}
       >
         <Outlet />
       </Content>
+
       <Footer
         style={{
           textAlign: 'center',

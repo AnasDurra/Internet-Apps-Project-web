@@ -3,9 +3,7 @@ import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { AiOutlineFile, AiTwotoneLock, AiTwotoneUnlock } from 'react-icons/ai';
 import { BsFileEarmarkLockFill, BsFillUnlockFill } from 'react-icons/bs';
-
 import { IoMdAdd } from 'react-icons/io';
-
 import { useState } from 'react';
 import Title from 'antd/es/typography/Title';
 import EditAccessModal from './modal-edit-access';
@@ -56,7 +54,7 @@ export default function ViewOneGroup() {
 
   const othersCheckedInColumns = [
     {
-      title: <Title level={3}> Currently Checked In (others)</Title>,
+      title: <span> Currently Checked In (others)</span>,
       children: [
         {
           width: '5%',
@@ -73,7 +71,7 @@ export default function ViewOneGroup() {
                 <Col>
                   <BsFileEarmarkLockFill
                     color='#003eb3'
-                    size={'3em'}
+                    size={'2em'}
                   />
                 </Col>
                 <Col style={{ marginBlock: 'auto' }}>
@@ -111,13 +109,13 @@ export default function ViewOneGroup() {
   ];
   const freeToUseColumns = [
     {
-      title: <Title level={3}> Free To Use</Title>,
+      title: <span> Free To Use</span>,
       children: [
         {
           title: <span style={{ marginLeft: '25%' }}>File name</span>,
           dataIndex: 'name',
           key: 'name',
-          width: '30%',
+          width: '25%',
 
           render: (text) => (
             <div>
@@ -125,7 +123,7 @@ export default function ViewOneGroup() {
                 <Col>
                   <AiOutlineFile
                     color='#003eb3'
-                    size={'3em'}
+                    size={'2em'}
                   />
                 </Col>
                 <Col style={{ marginBlock: 'auto' }}>
@@ -139,7 +137,7 @@ export default function ViewOneGroup() {
           title: 'Owner',
           dataIndex: 'owner',
           key: 'owner',
-          width: '20%',
+          width: '15%',
           render: (text) => text,
         },
 
@@ -153,7 +151,7 @@ export default function ViewOneGroup() {
         },
         {
           key: 'action',
-          width: '20%',
+          width: '30%',
           render: (_, record) => {
             return !freeToUseSelectedRowKeys?.length &&
               record.text != 'Public' ? (
@@ -218,13 +216,13 @@ export default function ViewOneGroup() {
   ];
   const myCheckedInColumns = [
     {
-      title: <Title level={3}> Currently Checked In (me)</Title>,
+      title: <span> Currently Checked In (me)</span>,
       children: [
         {
           title: <span style={{ marginLeft: '20%' }}>File name</span>,
           dataIndex: 'name',
           key: 'name',
-          width: '30%',
+          width: '25%',
 
           render: (text) => (
             <div>
@@ -232,7 +230,7 @@ export default function ViewOneGroup() {
                 <Col>
                   <BsFileEarmarkLockFill
                     color='#003eb3'
-                    size={'3em'}
+                    size={'2em'}
                   />
                 </Col>
                 <Col style={{ marginBlock: 'auto' }}>
@@ -246,7 +244,7 @@ export default function ViewOneGroup() {
           title: 'Owner',
           dataIndex: 'owner',
           key: 'owner',
-          width: '20%',
+          width: '15%',
           render: (text) => text,
         },
 
@@ -265,7 +263,7 @@ export default function ViewOneGroup() {
             return !myCheckedInSelectedRowKeys?.length &&
               record.text != 'Public' ? (
               <Row
-                gutter={16}
+                gutter={8}
                 justify={'space-evenly'}
               >
                 <Col>
@@ -290,7 +288,7 @@ export default function ViewOneGroup() {
                       <p style={{ marginRight: '0.5em' }}>check-out </p>
 
                       <BsFillUnlockFill
-                        size={'1.5em'}
+                        size={'1.2em'}
                         color='grey'
                       />
                     </div>
@@ -385,6 +383,35 @@ export default function ViewOneGroup() {
     },
     {
       key: '9',
+      name: 'Joe Black',
+      lastUpdated: '12 April 2023',
+      owner: 'Admin',
+      tags: ['cool', 'teacher'],
+    },
+    {
+      key: '10',
+      name: 'Joe Black',
+      lastUpdated: '12 April 2023',
+      owner: 'Admin',
+      tags: ['cool', 'teacher'],
+    },
+    {
+      key: 'a11',
+      name: 'Joe Black',
+      lastUpdated: '12 April 2023',
+      owner: 'Admin',
+      tags: ['cool', 'teacher'],
+    },
+
+    {
+      key: 'a12',
+      name: 'Joe Black',
+      lastUpdated: '12 April 2023',
+      owner: 'Admin',
+      tags: ['cool', 'teacher'],
+    },
+    {
+      key: 'a13',
       name: 'Joe Black',
       lastUpdated: '12 April 2023',
       owner: 'Admin',
@@ -523,7 +550,7 @@ export default function ViewOneGroup() {
   ];
 
   return (
-    <div style={{ height: '100%' }}>
+    <>
       {myCheckedInSelectedRowKeys?.length == 0 &&
         freeToUseSelectedRowKeys?.length == 0 && (
           <Row style={{ marginBottom: '1rem' }}>
@@ -544,13 +571,12 @@ export default function ViewOneGroup() {
 
       <Row
         gutter={24}
-        s
         style={{ height: '100%' }}
       >
         <Col span={12}>
           {myCheckedInSelectedRowKeys.length == 0 ? (
             <Table
-              pagination={{ pageSize: 9, position: ['bottomLeft'] }}
+              pagination={{ pageSize: 10, position: ['bottomLeft'] }}
               style={{ width: '100%' }}
               columns={freeToUseColumns}
               dataSource={data}
@@ -565,67 +591,66 @@ export default function ViewOneGroup() {
                 style={{ height: '50%' }}
               >
                 <Col span={12}>
-                  <a>
-                    <div
+                  <Button
+                    style={{
+                      width: '100%',
+                      borderRadius: '1em',
+                      height: '100%',
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 0.5em',
+                      backgroundColor: '#fafafa',
+                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                    }}
+                  >
+                    <Typography.Text
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '1em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#fafafa',
-                        width: '100%',
-                        boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                        marginRight: '0.5em',
+                        width: '40%',
+                        textAlign: 'center',
                       }}
                     >
-                      <Typography.Text
-                        style={{
-                          marginRight: '0.5em',
-                          width: '40%',
-                          textAlign: 'center',
-                        }}
-                      >
-                        Check-in
-                      </Typography.Text>
+                      Check-in{' '}
+                    </Typography.Text>
 
-                      <AiTwotoneLock
-                        size={'4em'}
-                        color='grey'
-                      />
-                    </div>
-                  </a>
+                    <AiTwotoneLock
+                      size={'3em'}
+                      color='grey'
+                    />
+                  </Button>
 
-                  <a>
-                    <div
+                  <Button
+                    style={{
+                      width: '100%',
+                      borderRadius: '1em',
+                      height: '100%',
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 0.5em',
+                      backgroundColor: '#fafafa',
+                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                      marginTop: '2em',
+                    }}
+                  >
+                    <Typography.Text
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '1em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#fafafa',
-                        boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                        width: '100%',
-                        marginTop: '2em',
-                        //height: '1.8em',
+                        marginRight: '0.5em',
+                        width: '40%',
+                        textAlign: 'center',
                       }}
                     >
-                      <Typography.Text
-                        style={{
-                          marginRight: '0.5em',
-                          width: '40%',
-                          textAlign: 'center',
-                        }}
-                      >
-                        Delete{' '}
-                      </Typography.Text>
+                      Delete{' '}
+                    </Typography.Text>
 
-                      <MdOutlineDeleteOutline
-                        size={'4em'}
-                        color='#ff7875'
-                      />
-                    </div>
-                  </a>
+                    <MdOutlineDeleteOutline
+                      size={'3em'}
+                      color='#ff7875'
+                    />
+                  </Button>
                 </Col>
               </Row>
             </>
@@ -649,13 +674,14 @@ export default function ViewOneGroup() {
               </Row>
 
               {myCheckedInSelectedRowKeys.length == 0 && (
-                <Row style={{ marginTop: '1.3em' }}>
+                <Row style={{ marginTop: '0em' }}>
                   <Table
                     pagination={{ pageSize: 3 }}
                     style={{ width: '100%' }}
                     columns={othersCheckedInColumns}
-                    dataSource={data3}
+                    dataSource={data}
                     size='small'
+
                     // rowSelection={rowSelection}
                   />
                 </Row>
@@ -669,67 +695,66 @@ export default function ViewOneGroup() {
                 style={{ height: '50%' }}
               >
                 <Col span={12}>
-                  <a>
-                    <div
+                  <Button
+                    style={{
+                      width: '100%',
+                      borderRadius: '1em',
+                      height: '100%',
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 0.5em',
+                      backgroundColor: '#fafafa',
+                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                    }}
+                  >
+                    <Typography.Text
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '1em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#fafafa',
-                        width: '100%',
-                        boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                        marginRight: '0.5em',
+                        width: '40%',
+                        textAlign: 'center',
                       }}
                     >
-                      <Typography.Text
-                        style={{
-                          marginRight: '0.5em',
-                          width: '40%',
-                          textAlign: 'center',
-                        }}
-                      >
-                        Check-in
-                      </Typography.Text>
+                      Check-in{' '}
+                    </Typography.Text>
 
-                      <AiTwotoneLock
-                        size={'4em'}
-                        color='grey'
-                      />
-                    </div>
-                  </a>
+                    <AiTwotoneLock
+                      size={'3em'}
+                      color='grey'
+                    />
+                  </Button>
 
-                  <a>
-                    <div
+                  <Button
+                    style={{
+                      width: '100%',
+                      borderRadius: '1em',
+                      height: '100%',
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 0.5em',
+                      backgroundColor: '#fafafa',
+                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
+                      marginTop: '2em',
+                    }}
+                  >
+                    <Typography.Text
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '1em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#fafafa',
-                        boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                        width: '100%',
-                        marginTop: '2em',
-                        //height: '1.8em',
+                        marginRight: '0.5em',
+                        width: '40%',
+                        textAlign: 'center',
                       }}
                     >
-                      <Typography.Text
-                        style={{
-                          marginRight: '0.5em',
-                          width: '40%',
-                          textAlign: 'center',
-                        }}
-                      >
-                        Delete{' '}
-                      </Typography.Text>
+                      Delete{' '}
+                    </Typography.Text>
 
-                      <MdOutlineDeleteOutline
-                        size={'4em'}
-                        color='#ff7875'
-                      />
-                    </div>
-                  </a>
+                    <MdOutlineDeleteOutline
+                      size={'3em'}
+                      color='#ff7875'
+                    />
+                  </Button>
                 </Col>
               </Row>
             </>
@@ -746,6 +771,6 @@ export default function ViewOneGroup() {
         isOpen={isNewFileModalOpen}
         setOpen={setIsNewFileModalOpen}
       />
-    </div>
+    </>
   );
 }
