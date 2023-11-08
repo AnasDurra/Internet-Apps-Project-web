@@ -1,0 +1,36 @@
+.app{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.login-page{
+min-height: 100vh;
+}
+
+.login-page-content{
+display: flex;
+justify-content: center;
+align-items: flex-start;
+}
+
+.custom-button {
+background-color: #6e0014; 
+color: #fff; 
+font-size: 16px;
+height: 35px;
+/* border: 1px solid #000 !important;  */
+}
+
+.custom-button:hover {
+background-color: #a6001e; 
+border: none;
+color: #fff !important;
+}
+
+* {
+font-family: 'Roboto', sans-serif !important; 
+}
+
+
+
