@@ -14,6 +14,18 @@ justify-content: center;
 align-items: flex-start;
 }
 
+.login-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 27em ;
+}
+
+/* .login::tem{
+  color: rebeccapurple;
+  background-color: wheat;
+} */
+
 .custom-button {
 background-color: #6e0014; 
 color: #fff; 
@@ -32,5 +44,26 @@ color: #fff !important;
 font-family: 'Roboto', sans-serif !important; 
 }
 
+.register-form{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
 
+.register-form-items{
+  width: 50%;
+}
+
+.register-image {
+  display: inline;
+}
+
+@media (max-width: 973px) {
+  .register-image {
+    display: none;
+  }
+  .register-form-items{
+    width: 100%;
+  }
+}
 

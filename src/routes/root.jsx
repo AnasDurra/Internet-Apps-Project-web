@@ -1,17 +1,13 @@
 import { Layout } from "antd";
-import { Content, Footer, Header } from "antd/es/layout/layout";
+
+import { Content, Footer } from "antd/es/layout/layout";
 import { Outlet } from "react-router-dom";
+import AppHeader from "./groups/AppHeader/AppHeader";
 
 export default function Root() {
   return (
     <Layout style={{ backgroundColor: "#fdfdfd", minHeight: "100%" }}>
-      <Header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#5c0011",
-        }}
-      />
+      <AppHeader />
       <Content
         style={{
           padding: "2% 5%",

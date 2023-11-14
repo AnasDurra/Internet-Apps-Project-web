@@ -46,18 +46,14 @@ const UserRegister = () => {
           style={{
             border: "2px solid #f0f0f0",
             borderRadius: "20px",
-            width: "75vw",
-            height: "90vh",
+            width: "85%",
+            height: "100%",
           }}
         >
-          <Space>
+          <div className="register-form">
             <Form
               layout="vertical"
-              style={{
-                width: "100%", // Change to 100% to match Card's width
-                marginRight: "200px",
-                marginLeft: "20px",
-              }}
+              className="register-form-items"
               autoComplete="off"
               onFinish={onFinish}
             >
@@ -96,6 +92,14 @@ const UserRegister = () => {
                     required: true,
                     message: "Please input your email!",
                   },
+                  {
+                    type: "email",
+                    message: "Please enter a valid email address",
+                  },
+                  {
+                    max: 255,
+                    message: "Email is too long",
+                  },
                 ]}
               >
                 <Input
@@ -127,6 +131,10 @@ const UserRegister = () => {
                   {
                     required: true,
                     message: "Please input your password!",
+                  },
+                  {
+                    min: 6,
+                    message: "Password must be at least 6 characters long",
                   },
                 ]}
               >
@@ -194,18 +202,10 @@ const UserRegister = () => {
                 </Typography.Text>
               </Form.Item>
             </Form>
-            <Image
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-                display: window.innerWidth <= 768 ? "none" : "block",
-                marginLeft: "200px",
-              }}
-              preview={false}
-              src={RegisterImage}
-              width={300}
-            ></Image>
-          </Space>
+            <div className="register-image">
+              <Image preview={false} src={RegisterImage} width={300}></Image>
+            </div>
+          </div>
         </Card>
       </div>
     </div>
