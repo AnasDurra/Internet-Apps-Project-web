@@ -168,12 +168,8 @@ const UserRegister = () => {
                 ]}
               >
                 <Input.Password
-                  prefix={
-                    <KeyOutlined
-                      style={{ color: "rgba(0,0,0,.25)" }}
-                      placeholder="Confirm Password"
-                    />
-                  }
+                  prefix={<KeyOutlined style={{ color: "rgba(0,0,0,.25)" }} />}
+                  placeholder="Confirm Password"
                 />
               </Form.Item>
               <Form.Item>
