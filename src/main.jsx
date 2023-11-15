@@ -4,12 +4,14 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root.jsx";
 import ErrorPage from "./error-page.jsx";
-import GroupsPage from "./routes/groups/groups-page.jsx";
+import ViewAllGroups from "./routes/groups/view-all-groups.jsx";
 import { ConfigProvider } from "antd";
-import ViewGroup from "./routes/groups/one-group-page.jsx";
+import ViewOneGroup from "./routes/groups/view-one-group.jsx';
+import store from './app/store.js';
+import { Provider } from 'react-redux';
+import DummyPage from './dummy.jsx";
 import LoginPage from "./routes/groups/RegisterationPages/LoginPage.jsx";
 import UserRegister from "./routes/groups/RegisterationPages/UserRegister.jsx";
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,8 +19,8 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "groups",
-        element: <GroupsPage />,
+        path: 'groups',
+        element: <ViewAllGroups />,
       },
       {
         path: "groups/:group_name",
@@ -26,7 +28,11 @@ const router = createBrowserRouter([
       },
       {
         path: "groups/:group_name",
-        element: <ViewGroup />,
+        element: <ViewOneGroup />,
+      },
+      {
+        path: 'test',
+        element: <DummyPage />,
       },
       {
         path: "login",
@@ -42,15 +48,17 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        token: {
-          fontSize: 16,
-          colorPrimary: "#610b00",
-        },
-      }}
-    >
-      <RouterProvider router={router} />
-    </ConfigProvider>
+      <Provider store={store}>
+        <ConfigProvider
+          theme={{
+            token: {
+              //  fontSize: 12,
+              colorPrimary: '#610b00',
+            },
+          }}
+        >
+          <RouterProvider router={router} />
+        </ConfigProvider>
+      </Provider>
   </React.StrictMode>
 );

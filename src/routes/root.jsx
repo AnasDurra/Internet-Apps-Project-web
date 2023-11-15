@@ -6,7 +6,7 @@ import AppHeader from "./groups/AppHeader/AppHeader";
 
 export default function Root() {
   return (
-    <Layout style={{ backgroundColor: "#fdfdfd", minHeight: "100%" }}>
+    <Layout>
       <AppHeader />
       <Content
         style={{
@@ -16,6 +16,7 @@ export default function Root() {
       >
         <Outlet />
       </Content>
+
       <Footer
         style={{
           textAlign: "center",

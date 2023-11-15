@@ -5,12 +5,12 @@ import { IoMdAdd } from 'react-icons/io';
 
 import { useState } from 'react';
 import Title from 'antd/es/typography/Title';
-import EditAccessModal from './edit-access-modal';
-import NewGroupModal from './new-group-modal';
+import EditAccessModal from './modal-edit-access';
+import NewGroupModal from './modal-new-group';
 import { useNavigate } from 'react-router-dom';
-import '/src/routes/groups/style.css';
+import '/src/routes/groups/zstyle.css';
 
-export default function GroupsPage() {
+export default function ViewAllGroups() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
@@ -23,12 +23,11 @@ export default function GroupsPage() {
   const rowSelection = {
     selectedRowKeys,
     columnWidth: '5%',
-    // hideSelectAll: true,
     onChange: onSelectChange,
     getCheckboxProps: (record) => {
       console.log(record);
       return {
-        disabled: record.name == 'Public', //disable the first 4 rows only
+        disabled: record.name == 'Public',
       };
     },
   };
@@ -76,30 +75,6 @@ export default function GroupsPage() {
 
       render: (text) => text,
     },
-
-    /* {
-      title: 'Tags',
-      key: 'tags',
-      dataIndex: 'tags',
-      render: (_, { tags }) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
-            return (
-              <Tag
-                color={color}
-                key={tag}
-              >
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
-    }, */
     {
       key: 'action',
       width: '20%',
@@ -108,7 +83,8 @@ export default function GroupsPage() {
           <Row gutter={16}>
             <Col offset={8}>
               <a
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   setIsEditAccessModalOpen(true);
                 }}
               >
@@ -119,7 +95,11 @@ export default function GroupsPage() {
               </a>
             </Col>
             <Col>
-              <a onClick={() => {}}>
+              <a
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
                 <MdOutlineDeleteOutline
                   size={'2em'}
                   color='#ff7875'
@@ -173,6 +153,7 @@ export default function GroupsPage() {
           </Button>
         </Col>
       </Row>
+      
       <Row>
         <Table
           rowClassName={() => 'row'}
