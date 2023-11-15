@@ -1,25 +1,57 @@
 import { Button } from 'antd';
-import { useSignupQuery } from './app/services/auth';
-import { apiSlice } from './app/apiSlice';
-import { auth } from './app/services/auth';
+import {
+  useLazySignupQuery,
+  useLoginMutation,
+  useLogoutMutation,
+} from './app/services/auth';
+import { useEffect } from 'react';
+import Cookies from 'js-cookie';
+
+const dummyData = {
+  username: 'zal21azael121',
+  full_name: 'Alaa Zamel',
+  email: 'az1laaa3zame210@gmail.com',
+  password: '12341234',
+};
 
 export default function DummyPage() {
-  const [trigger, results, { data }] = auth.endpoints.signup.useLazyQuery();
+  const [trigger, results] = useLazySignupQuery();
+  const [trigger2] = useLoginMutation();
+  const [trigger3] = useLogoutMutation();
+
+  useEffect(() => {
+    if (results.data?.accessToken)
+      Cookies.set('accessToken', results.data?.accessToken);
+  }, [results.data]);
+
   return (
     <div>
       <Button
         onClick={() => {
-          trigger({
-            username: 'alaazamel21',
-            full_name: 'Alaa Zamel',
-            email: 'alaa.zamel20@gmail.com',
-            password: '12341234',
-          });
+          trigger(dummyData);
         }}
       >
         signup
       </Button>
-      {data}
+
+      <Button
+        onClick={() => {
+          trigger2({
+            username: dummyData.username,
+            password: dummyData.password,
+          });
+        }}
+      >
+        login
+      </Button>
+
+      <Button
+        onClick={() => {
+          trigger3();
+        }}
+      >
+        logout
+      </Button>
     </div>
   );
 }

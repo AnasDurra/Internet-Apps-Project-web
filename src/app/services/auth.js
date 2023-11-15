@@ -1,12 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import store from '../store.js';
 import { apiSlice } from '../apiSlice';
 
 export const auth = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.query({
       query: (credentials) => ({
-        url: 'auth/signup',
+        url: 'auth/register',
         method: 'POST',
         body: credentials,
       }),
@@ -39,7 +37,7 @@ export const auth = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
-  useProtectedMutation,
   useLogoutMutation,
   useSignupQuery,
+  useLazySignupQuery
 } = auth;

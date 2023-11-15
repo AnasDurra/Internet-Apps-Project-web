@@ -35,17 +35,17 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <ConfigProvider
-        theme={{
-          token: {
-            //  fontSize: 12,
-            colorPrimary: '#610b00',
-          },
-        }}
-      >
-        <RouterProvider router={router} />
-      </ConfigProvider>
-    </Provider>
+      <Provider store={store}>
+        <ConfigProvider
+          theme={{
+            token: {
+              //  fontSize: 12,
+              colorPrimary: '#610b00',
+            },
+          }}
+        >
+          <RouterProvider router={router} />
+        </ConfigProvider>
+      </Provider>
   </React.StrictMode>
 );
