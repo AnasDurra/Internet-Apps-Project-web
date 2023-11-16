@@ -6,10 +6,10 @@ import Root from "./routes/root.jsx";
 import ErrorPage from "./error-page.jsx";
 import ViewAllGroups from "./routes/groups/view-all-groups.jsx";
 import { ConfigProvider } from "antd";
-import ViewOneGroup from "./routes/groups/view-one-group.jsx';
-import store from './app/store.js';
-import { Provider } from 'react-redux';
-import DummyPage from './dummy.jsx";
+import ViewOneGroup from "./routes/groups/view-one-group.jsx";
+import store from "./app/store.js";
+import { Provider } from "react-redux";
+import DummyPage from "./dummy.jsx";
 import LoginPage from "./routes/groups/RegisterationPages/LoginPage.jsx";
 import UserRegister from "./routes/groups/RegisterationPages/UserRegister.jsx";
 const router = createBrowserRouter([
@@ -19,19 +19,15 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: 'groups',
+        path: "groups",
         element: <ViewAllGroups />,
-      },
-      {
-        path: "groups/:group_name",
-        element: <ViewGroup />,
       },
       {
         path: "groups/:group_name",
         element: <ViewOneGroup />,
       },
       {
-        path: 'test',
+        path: "test",
         element: <DummyPage />,
       },
       {
@@ -47,18 +43,18 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-      <Provider store={store}>
-        <ConfigProvider
-          theme={{
-            token: {
-              //  fontSize: 12,
-              colorPrimary: '#610b00',
-            },
-          }}
-        >
-          <RouterProvider router={router} />
-        </ConfigProvider>
-      </Provider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <Provider store={store}>
+    <ConfigProvider
+      theme={{
+        token: {
+          //  fontSize: 12,
+          colorPrimary: "#610b00",
+        },
+      }}
+    >
+      <RouterProvider router={router} />
+    </ConfigProvider>
+  </Provider>
+  // </React.StrictMode>
 );

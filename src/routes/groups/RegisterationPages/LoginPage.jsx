@@ -1,42 +1,66 @@
-import { UserOutlined, LockOutlined, LoginOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  LockOutlined,
+  LoginOutlined,
+  CheckCircleTwoTone,
+} from "@ant-design/icons";
+import { useLoginMutation } from "../../../app/services/auth";
 import { Button, Form, Image, Input, Space, Typography, message } from "antd";
-import React, { useState } from "react";
-import cloudImage from "../../../assets/cloud.png";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./style.css";
 
 import LoginImage from "../../../assets/login.png";
+import cloudImage from "../../../assets/cloud.png";
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [loginMutation, { isLoading, isError, error }] = useLoginMutation();
   const [messageApi, contextHolder] = message.useMessage();
+  const [formDisabled, setFormDisabled] = useState(false);
+  const navigate = useNavigate();
 
   const success = () => {
-    setError(false);
     messageApi.open({
       type: "success",
+      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
       content: "Log in successfully",
     });
   };
   const warning = () => {
-    setError(true);
     messageApi.open({
       type: "warning",
       content: "The user name or password is incorrect",
     });
   };
 
-  const onFinish = (values) => {
-    setLoading(true);
+  const wrong = () => {
+    messageApi.open({
+      type: "error",
+      content: "Something went wrong!",
+    });
+  };
 
-    setTimeout(() => {
-      warning();
-      setLoading(false);
-    }, 4000);
+  const onFinish = async (values) => {
+    try {
+      const result = await loginMutation(values);
+
+      if (result.error) {
+        if (result.error.status === 401) {
+          warning();
+        } else {
+          wrong();
+        }
+      } else {
+        success();
+        setFormDisabled(true);
+        setTimeout(() => {
+          navigate("/");
+          setFormDisabled(false);
+        }, 1000);
+      }
+    } catch (error) {
+      wrong();
+    }
   };
   return (
     <div className="login-page">
@@ -63,7 +87,11 @@ const LoginPage = () => {
         </Typography.Title>
       </Space>
       <div className="login-page-content">
-        <Form className="login-form" onFinish={onFinish}>
+        <Form
+          className="login-form"
+          disabled={isLoading || formDisabled}
+          onFinish={onFinish}
+        >
           <Image preview={false} width={150} src={cloudImage}></Image>
           <Typography.Title level={2}>Welcome Back</Typography.Title>
           <Typography.Paragraph>
@@ -80,7 +108,6 @@ const LoginPage = () => {
             ]}
           >
             <Input
-              disabled={loading}
               style={{
                 width: "100%",
                 height: "40px",
@@ -98,15 +125,10 @@ const LoginPage = () => {
                 required: true,
                 message: "Please enter your password",
               },
-              {
-                min: 6,
-                message: "Password must be at least 6 characters long",
-              },
             ]}
           >
             <Input.Password
               status={""}
-              disabled={loading}
               style={{
                 height: "40px",
               }}
@@ -118,7 +140,7 @@ const LoginPage = () => {
           <Form.Item style={{ width: "100%", marginBottom: 15 }}>
             <Button
               style={{ width: "100%" }}
-              loading={loading}
+              loading={isLoading}
               icon={<LoginOutlined />}
               className="custom-button"
               htmlType="submit"
