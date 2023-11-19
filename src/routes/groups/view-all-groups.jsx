@@ -2,15 +2,17 @@ import { Button, Col, Row, Space, Table, Tag, Typography } from 'antd';
 import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { IoMdAdd } from 'react-icons/io';
-
 import { useState } from 'react';
 import Title from 'antd/es/typography/Title';
 import EditAccessModal from './modal-edit-access';
 import NewGroupModal from './modal-new-group';
 import { useNavigate } from 'react-router-dom';
 import '/src/routes/groups/zstyle.css';
+import { useGetQuery } from '../../app/services/folders';
 
 export default function ViewAllGroups() {
+  const { data: folders, isLoading, isError } = useGetQuery();
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
@@ -37,7 +39,6 @@ export default function ViewAllGroups() {
       dataIndex: 'name',
       key: 'name',
       width: '40%',
-
       render: (text) => (
         <div>
           <Row gutter={16}>
@@ -107,9 +108,7 @@ export default function ViewAllGroups() {
               </a>
             </Col>
           </Row>
-        ) : (
-          <></>
-        );
+        ) : null;
       },
     },
   ];
@@ -153,14 +152,13 @@ export default function ViewAllGroups() {
           </Button>
         </Col>
       </Row>
-      
+
       <Row>
         <Table
           rowClassName={() => 'row'}
           style={{ width: '100%' }}
           columns={columns}
           dataSource={data}
-          size='large'
           rowSelection={rowSelection}
           onRow={(record, rowIndex) => {
             return {

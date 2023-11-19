@@ -9,20 +9,24 @@ import Cookies from 'js-cookie';
 
 const dummyData = {
   username: 'zal21azael121',
+  password: '12341234',
   full_name: 'Alaa Zamel',
   email: 'az1laaa3zame210@gmail.com',
-  password: '12341234',
 };
 
 export default function DummyPage() {
   const [trigger, results] = useLazySignupQuery();
-  const [trigger2] = useLoginMutation();
+  const [trigger2, { data }] = useLoginMutation();
   const [trigger3] = useLogoutMutation();
 
   useEffect(() => {
     if (results.data?.accessToken)
       Cookies.set('accessToken', results.data?.accessToken);
   }, [results.data]);
+
+  useEffect(() => {
+    if (data?.accessToken) Cookies.set('accessToken', data?.accessToken);
+  }, [data?.accessToken]);
 
   return (
     <div>

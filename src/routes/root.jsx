@@ -16,6 +16,7 @@ export default function Root() {
       <Content
         style={{
           padding: '1% 5%',
+          minHeight: '82vh',
         }}
       >
         <Outlet />
