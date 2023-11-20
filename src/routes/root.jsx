@@ -1,22 +1,18 @@
-import { Layout } from 'antd';
-import { Content, Footer, Header } from 'antd/es/layout/layout';
-import { Outlet } from 'react-router-dom';
+import { Layout } from "antd";
+
+import { Content, Footer } from "antd/es/layout/layout";
+import { Outlet } from "react-router-dom";
+import AppHeader from "./groups/AppHeader/AppHeader";
 
 export default function Root() {
   return (
     <Layout>
-      <Header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: '#5c0011',
-        }}
-      />
-
+      <AppHeader />
       <Content
         style={{
-          padding: '1% 5%',
-          minHeight: '82vh',
+          padding: "2% 5%",
+          backgroundColor: "#fdfdfd",
+          minHeight: "82vh",
         }}
       >
         <Outlet />
@@ -24,7 +20,7 @@ export default function Root() {
 
       <Footer
         style={{
-          textAlign: 'center',
+          textAlign: "center",
         }}
       >
         Internet Apps Project (23-24)
