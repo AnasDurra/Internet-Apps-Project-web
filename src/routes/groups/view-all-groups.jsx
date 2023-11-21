@@ -2,7 +2,7 @@ import { Button, Col, Row, Space, Table, Tag, Typography } from 'antd';
 import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { IoMdAdd } from 'react-icons/io';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Title from 'antd/es/typography/Title';
 import EditAccessModal from './modal-edit-access';
 import NewGroupModal from './modal-new-group';
@@ -19,7 +19,6 @@ export default function ViewAllGroups() {
   const navigate = useNavigate();
 
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
@@ -27,7 +26,6 @@ export default function ViewAllGroups() {
     columnWidth: '5%',
     onChange: onSelectChange,
     getCheckboxProps: (record) => {
-      console.log(record);
       return {
         disabled: record.name == 'Public',
       };
@@ -62,7 +60,7 @@ export default function ViewAllGroups() {
     },
     {
       title: 'Owner',
-      dataIndex: 'owner',
+      dataIndex: ['owner','username'],
       key: 'owner',
       width: '20%',
       render: (text) => text,
@@ -70,7 +68,7 @@ export default function ViewAllGroups() {
 
     {
       title: 'Last Updated',
-      dataIndex: 'lastUpdated',
+      dataIndex: 'updated_at',
       key: 'lastUpdated',
       width: '20%',
 
@@ -136,6 +134,10 @@ export default function ViewAllGroups() {
     },
   ];
 
+  useEffect(() => {
+    console.log('fodlers', folders);
+  }, [folders]);
+
   return (
     <div>
       <Row style={{ marginBottom: '1rem' }}>
@@ -158,7 +160,7 @@ export default function ViewAllGroups() {
           rowClassName={() => 'row'}
           style={{ width: '100%' }}
           columns={columns}
-          dataSource={data}
+          dataSource={folders}
           rowSelection={rowSelection}
           onRow={(record, rowIndex) => {
             return {

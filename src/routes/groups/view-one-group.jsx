@@ -30,7 +30,6 @@ export default function ViewOneGroup() {
       setFreeToUseSelectedRowKeys(newSelectedRowKeys);
     },
     getCheckboxProps: (record) => {
-      console.log(record);
       return {
         disabled: record.name == 'Public',
       };
@@ -45,7 +44,6 @@ export default function ViewOneGroup() {
       setMyCheckedInSelectedRowKeys(newSelectedRowKeys);
     },
     getCheckboxProps: (record) => {
-      console.log(record);
       return {
         disabled: record.name == 'Public',
       };

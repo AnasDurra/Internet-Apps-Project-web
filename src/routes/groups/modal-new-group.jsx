@@ -1,37 +1,54 @@
 import {
+  Avatar,
   Button,
   Col,
   Empty,
   Form,
   Input,
+  List,
   Modal,
   Row,
   Select,
   Space,
   Tag,
+  Typography,
 } from 'antd';
-import Title from 'antd/es/typography/Title';
-import Typography from 'antd/es/typography/Typography';
 import { BsPerson } from 'react-icons/bs';
 import { useCreateQuery, useLazyCreateQuery } from '../../app/services/folders';
 import { useForm } from 'antd/es/form/Form';
 import FormItem from 'antd/es/form/FormItem';
+import { useEffect } from 'react';
+import Title from 'antd/es/typography/Title';
+import Text from 'antd/es/typography/Text';
+import {
+  DeleteColumnOutlined,
+  SmileOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 
 export default function NewGroupModal({ isOpen, setOpen }) {
-  const { create, results } = useLazyCreateQuery();
+  const [createFolder, results] = useLazyCreateQuery();
   const [form] = useForm();
+
+  const closeModal = () => {
+    form.resetFields();
+    setOpen(false);
+  };
+
   return (
     <Modal
       open={isOpen}
-      onCancel={() => setOpen(false)}
-      onOk={() => setOpen(false)}
-      okText={'Save'}
+      footer={null}
       width={'40%'}
-      title={'Add New Group'}
+      title={'Create New Group'}
+      onCancel={closeModal}
     >
       <Form
         form={form}
-        onFinish={(fields) => {}}
+        onFinish={(fields) => {
+          console.log('fields', fields);
+          createFolder({ name: fields.name, access_list: fields.users });
+        }}
       >
         <div style={{ margin: '2em' }}>
           <Title
@@ -41,7 +58,6 @@ export default function NewGroupModal({ isOpen, setOpen }) {
             Name
           </Title>
           <Form.Item
-            label='Group Name'
             name='name'
             rules={[
               {
@@ -51,7 +67,7 @@ export default function NewGroupModal({ isOpen, setOpen }) {
           >
             <Input
               style={{ width: '40%' }}
-              placeholder='Enter Group Name'
+              placeholder='Enter Group Name*'
             />
           </Form.Item>
 
@@ -62,82 +78,96 @@ export default function NewGroupModal({ isOpen, setOpen }) {
             People With Access
           </Title>
 
-          <Form.List>
-            {(fields, { add, remove }, { errors }) => (
-              <>
-                {fields.length == 0 && <Empty>No Added Users</Empty>}
-                {fields.map((field, index) => (
-                  <div
-                    key={field.key}
-                    style={{ margin: '1em 0' }}
-                  >
-                    <Row>
-                      <Col>
-                        <BsPerson size={'1.2em'}></BsPerson>
-                      </Col>
-                      <Col
-                        offset={1}
-                        span={4}
-                      >
-                        <Typography.Text>@anas_rish</Typography.Text>
-                      </Col>
-                    </Row>
-                  </div>
-                ))}
+          <Form.Item
+            name='users'
+            hidden
+          />
 
-                <Title level={5}> Add People</Title>
-                <Form.Item name={'addUser'}>
-                  <Space>
-                    <Input placeholder='Username' />
-                    <Button
-                      onClick={() => {
-                        if (form.getFieldValue(['addUser'])) add();
-                      }}
-                    >
-                      add
-                    </Button>
-                  </Space>
-                </Form.Item>
-
-                <Form.ErrorList errors={errors} />
-              </>
-            )}
-          </Form.List>
-
-          {/*    <div style={{ margin: '1em 0' }}>
-            <Row>
-              <Col>
-                <BsPerson size={'1.2em'}></BsPerson>
-              </Col>
-              <Col
-                offset={1}
-                span={4}
-              >
-                <Typography.Text>@alaa_zamel</Typography.Text>
-              </Col>
-              <Col span={4}>
-                <Select
-                  style={{ width: '100%' }}
-                  defaultValue='editor'
-                  onChange={() => {}}
-                  options={[
-                    { value: 'editor', label: 'Editor' },
-                    { value: 'viewer', label: 'Viewer' },
-                  ]}
-                />
-              </Col>
-              <Col offset={2}>
-                <Tag>New</Tag>
-              </Col>
-            </Row>
-          </div> */}
-
-          {/*   <Title level={5}> Add People</Title>
           <Space>
             <Input placeholder='Username' />
-            <Button>add</Button>
-          </Space> */}
+            <Button
+              onClick={() => {
+                const users = form.getFieldValue('users') || [];
+                console.log('users in btn', users);
+                form.setFieldValue(['users'], [...users, 1]); //TODO user object
+              }}
+            >
+              add
+            </Button>
+          </Space>
+
+          <Form.Item
+            shouldUpdate={(prevValues, curValues) =>
+              prevValues.users !== curValues.users
+            }
+          >
+            {({ getFieldValue }) => {
+              const users = getFieldValue('users') || [];
+              return users.length ? (
+                <List
+                  style={{
+                    marginTop: '1em',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                  }}
+                  itemLayout='horizontal'
+                  dataSource={users}
+                  renderItem={(item, index) => (
+                    <List.Item
+                      extra={
+                        <Button
+                          type='text'
+                          danger
+                          onClick={() => {
+                            const updatedUsers = [
+                              ...form.getFieldValue('users'),
+                            ]; // Create a copy of the array
+                            updatedUsers.splice(index, 1); // Remove the element at the specified index
+                            form.setFieldValue(['users'], updatedUsers);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      }
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
+                          />
+                        }
+                        title={`${item} (@username)`}
+                        /* description={
+                          index == 0 ? 'owner' : null
+                        } */
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty
+                  style={{ margin: '1.5em' }}
+                  description={'No Users'}
+                />
+              );
+            }}
+          </Form.Item>
         </div>
+
+        <Space style={{ width: '100%', justifyContent: 'end' }}>
+          <Button
+            type='text'
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button
+            type='primary'
+            htmlType='submit'
+          >
+            Create
+          </Button>
+        </Space>
       </Form>
     </Modal>
   );

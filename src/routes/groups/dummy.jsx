@@ -1,132 +1,160 @@
-import React from 'react';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
-const formItemLayout = {
+import React, { useEffect, useRef, useState } from 'react';
+import { SmileOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Form, Input, InputNumber, Modal, Space, Typography } from 'antd';
+const layout = {
   labelCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 4,
-    },
+    span: 8,
   },
   wrapperCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 20,
-    },
+    span: 16,
   },
 };
-const formItemLayoutWithOutLabel = {
+const tailLayout = {
   wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0,
-    },
-    sm: {
-      span: 20,
-      offset: 4,
-    },
+    offset: 8,
+    span: 16,
   },
 };
-const App = () => {
-  const onFinish = (values) => {
-    console.log('Received values of form:', values);
+// reset form fields when modal is form, closed
+const useResetFormOnCloseModal = ({ form, open }) => {
+  const prevOpenRef = useRef();
+  useEffect(() => {
+    prevOpenRef.current = open;
+  }, [open]);
+  const prevOpen = prevOpenRef.current;
+  useEffect(() => {
+    if (!open && prevOpen) {
+      form.resetFields();
+    }
+  }, [form, prevOpen, open]);
+};
+const ModalForm = ({ open, onCancel }) => {
+  const [form] = Form.useForm();
+  useResetFormOnCloseModal({
+    form,
+    open,
+  });
+  const onOk = () => {
+    form.submit();
   };
   return (
-    <Form
-      name="dynamic_form_item"
-      {...formItemLayoutWithOutLabel}
-      onFinish={onFinish}
-      style={{
-        maxWidth: 600,
+    <Modal title="Basic Drawer" open={open} onOk={onOk} onCancel={onCancel}>
+      <Form form={form} layout="vertical" name="userForm">
+        <Form.Item
+          name="name"
+          label="User Name"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="age"
+          label="User Age"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <InputNumber />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+const App = () => {
+  const [open, setOpen] = useState(false);
+  const showUserModal = () => {
+    setOpen(true);
+  };
+  const hideUserModal = () => {
+    setOpen(false);
+  };
+  const onFinish = (values) => {
+    console.log('Finish:', values);
+  };
+  return (
+    <Form.Provider
+      onFormFinish={(name, { values, forms }) => {
+        if (name === 'userForm') {
+          const { basicForm } = forms;
+          const users = basicForm.getFieldValue('users') || [];
+          basicForm.setFieldsValue({
+            users: [...users, values],
+          });
+          setOpen(false);
+        }
       }}
     >
-      <Form.List
-        name="names"
-        rules={[
-          {
-            validator: async (_, names) => {
-              if (!names || names.length < 2) {
-                return Promise.reject(new Error('At least 2 passengers'));
-              }
-            },
-          },
-        ]}
+      <Form
+        {...layout}
+        name="basicForm"
+        onFinish={onFinish}
+        style={{
+          maxWidth: 600,
+        }}
       >
-        {(fields, { add, remove }, { errors }) => (
-          <>
-            {fields.map((field, index) => (
-              <Form.Item
-                {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-                label={index === 0 ? 'Passengers' : ''}
-                required={false}
-                key={field.key}
-              >
-                <Form.Item
-                  {...field}
-                  validateTrigger={['onChange', 'onBlur']}
-                  rules={[
-                    {
-                      required: true,
-                      whitespace: true,
-                      message: "Please input passenger's name or delete this field.",
-                    },
-                  ]}
-                  noStyle
-                >
-                  <Input
-                    placeholder="passenger name"
-                    style={{
-                      width: '60%',
-                    }}
-                  />
-                </Form.Item>
-                {fields.length > 1 ? (
-                  <MinusCircleOutlined
-                    className="dynamic-delete-button"
-                    onClick={() => remove(field.name)}
-                  />
-                ) : null}
-              </Form.Item>
-            ))}
-            <Form.Item>
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                style={{
-                  width: '60%',
-                }}
-                icon={<PlusOutlined />}
-              >
-                Add field
-              </Button>
-              <Button
-                type="dashed"
-                onClick={() => {
-                  add('The head item', 0);
-                }}
-                style={{
-                  width: '60%',
-                  marginTop: '20px',
-                }}
-                icon={<PlusOutlined />}
-              >
-                Add field at head
-              </Button>
-              <Form.ErrorList errors={errors} />
-            </Form.Item>
-          </>
-        )}
-      </Form.List>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item
+          name="group"
+          label="Group Name"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+
+        {/* Create a hidden field to make Form instance record this */}
+        <Form.Item name="users" hidden />
+
+        <Form.Item
+          label="User List"
+          shouldUpdate={(prevValues, curValues) => prevValues.users !== curValues.users}
+        >
+          {({ getFieldValue }) => {
+            const users = getFieldValue('users') || [];
+            return users.length ? (
+              <ul>
+                {users.map((user) => (
+                  <li key={user.name} className="user">
+                    <Space>
+                      <Avatar icon={<UserOutlined />} />
+                      {`${user.name} - ${user.age}`}
+                    </Space>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Typography.Text className="ant-form-text" type="secondary">
+                ( <SmileOutlined /> No user yet. )
+              </Typography.Text>
+            );
+          }}
+        </Form.Item>
+        <Form.Item >
+          <Button htmlType="submit" type="primary">
+            Submit
+          </Button>
+          <Button
+            htmlType="button"
+            style={{
+              margin: '0 8px',
+            }}
+            onClick={showUserModal}
+          >
+            Add User
+          </Button>
+        </Form.Item>
+      </Form>
+
+      <ModalForm open={open} onCancel={hideUserModal} />
+    </Form.Provider>
   );
 };
 export default App;
