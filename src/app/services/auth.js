@@ -39,5 +39,4 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useSignupMutation,
-  useLazySignupQuery
 } = auth;

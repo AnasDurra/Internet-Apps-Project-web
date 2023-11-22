@@ -1,8 +1,7 @@
 import { Layout } from "antd";
-
 import { Content, Footer } from "antd/es/layout/layout";
 import { Outlet } from "react-router-dom";
-import AppHeader from "./groups/AppHeader/AppHeader";
+import AppHeader from "./AppHeader/AppHeader";
 
 export default function Root() {
   return (

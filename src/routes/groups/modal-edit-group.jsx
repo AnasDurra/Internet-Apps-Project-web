@@ -10,14 +10,21 @@ import {
   Row,
   Select,
   Space,
+  Tag,
+  theme,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import Title from 'antd/es/typography/Title';
-import { useGetUsersQuery } from '../../app/services/users';
+import Typography from 'antd/es/typography/Typography';
+import { BsPerson } from 'react-icons/bs';
+import { IoIosAdd, IoIosRemove } from 'react-icons/io';
 import { useLazyGetFoldersQuery } from '../../app/services/folders';
+import { useGetUsersQuery } from '../../app/services/users';
 import { useEffect, useState } from 'react';
 
-export default function NewGroupModal({ isOpen, setOpen }) {
+const { useToken } = theme;
+
+export default function EditGroupModal({ isOpen, setOpen, folder }) {
   const [createFolder] = useLazyGetFoldersQuery();
   const { data: users, isLoading } = useGetUsersQuery();
 

@@ -4,9 +4,11 @@ import Cookies from 'js-cookie';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://192.168.189.208:8000/',
+    credentials: 'same-origin',
+    baseUrl: 'http://localhost:8000/',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
+      console.log('token', token);
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
       }
@@ -14,6 +16,5 @@ export const apiSlice = createApi({
     },
   }),
   endpoints: () => ({}),
+  tagTypes: ['Folder'],
 });
-
-export const { useGetPostsQuery } = apiSlice;

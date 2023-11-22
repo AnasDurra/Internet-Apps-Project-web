@@ -8,19 +8,19 @@ import {
   Spin,
   Typography,
   message,
-} from "antd";
+} from 'antd';
 import {
   UserAddOutlined,
   UserOutlined,
   MailFilled,
   KeyOutlined,
   CheckCircleTwoTone,
-} from "@ant-design/icons";
-import RegisterImage from "../../../assets/register.png";
-import "./style.css";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useSignupMutation } from "../../../app/services/auth";
+} from '@ant-design/icons';
+import RegisterImage from '../../assets/register.png';
+import './style.css';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSignupMutation } from '../../app/services/auth';
 
 const UserRegister = () => {
   const navigate = useNavigate();
@@ -32,30 +32,32 @@ const UserRegister = () => {
 
   const success = () => {
     messageApi.open({
-      type: "success",
-      icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-      content: "Registeration complete successfully",
+      type: 'success',
+      icon: <CheckCircleTwoTone twoToneColor='#52c41a' />,
+      content: 'Registeration complete successfully',
     });
   };
 
   const warning = (meesage) => {
     messageApi.open({
-      type: "warning",
+      type: 'warning',
       content: meesage,
     });
   };
 
   const wrong = () => {
     messageApi.open({
-      type: "error",
-      content: "Something went wrong!",
+      type: 'error',
+      content: 'Something went wrong!',
     });
   };
+
+  useEffect(() => {},[]);
 
   const onFinish = async (values) => {
     const credentials = {
       username: values.username,
-      full_name: values.first_name + " " + values.last_name,
+      full_name: values.first_name + ' ' + values.last_name,
       email: values.email,
       password: values.password,
     };
@@ -63,12 +65,12 @@ const UserRegister = () => {
       const result = await signupMutation(credentials);
       if (result.error) {
         if (result.error.status === 400) {
-          const errorType = result.error.data.message.split(" ")[0];
-          if (errorType === "username") {
+          const errorType = result.error.data.message.split(' ')[0];
+          if (errorType === 'username') {
             setEmailWarning(false);
             setUsernameWarning(true);
             warning(result.error.data.message);
-          } else if (errorType === "email") {
+          } else if (errorType === 'email') {
             setUsernameWarning(false);
             setEmailWarning(true);
             warning(result.error.data.message);
@@ -82,7 +84,7 @@ const UserRegister = () => {
         success();
         setFormDisabled(true);
         setTimeout(() => {
-          navigate("/login");
+          navigate('/login');
           setFormDisabled(false);
         }, 2000);
       }
@@ -92,24 +94,24 @@ const UserRegister = () => {
     }
   };
   return (
-    <div className="user-register-page">
+    <div className='user-register-page'>
       {contextHolder}
       <Space
         style={{
-          marginBottom: "20px",
+          marginBottom: '20px',
         }}
       >
         <UserAddOutlined
           style={{
-            fontSize: "40px",
-            backgroundColor: "#b3cde0",
-            padding: "10px",
-            borderRadius: "40px",
+            fontSize: '40px',
+            backgroundColor: '#b3cde0',
+            padding: '10px',
+            borderRadius: '40px',
           }}
         />
         <Typography.Title
           style={{
-            marginLeft: "15px",
+            marginLeft: '15px',
           }}
           level={3}
         >
@@ -117,137 +119,137 @@ const UserRegister = () => {
         </Typography.Title>
       </Space>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Card
           style={{
-            border: "2px solid #f0f0f0",
-            borderRadius: "20px",
-            width: "85%",
-            height: "100%",
+            border: '2px solid #f0f0f0',
+            borderRadius: '20px',
+            width: '85%',
+            height: '100%',
           }}
         >
           <Spin
             spinning={isLoading || formDisabled}
-            tip={<span style={{ fontSize: "16px" }}>Please Wait...</span>}
+            tip={<span style={{ fontSize: '16px' }}>Please Wait...</span>}
           >
-            <div className="register-form">
+            <div className='register-form'>
               <Form
-                layout="vertical"
-                className="register-form-items"
-                autoComplete="off"
+                layout='vertical'
+                className='register-form-items'
+                autoComplete='off'
                 onFinish={onFinish}
               >
                 <Form.Item
-                  name={"first_name"}
-                  label={"Fist Name"}
+                  name={'first_name'}
+                  label={'Fist Name'}
                   required
                   rules={[
                     {
                       required: true,
-                      message: "Please input your first name!",
+                      message: 'Please input your first name!',
                     },
                   ]}
                 >
-                  <Input placeholder={"First Name"} />
+                  <Input placeholder={'First Name'} />
                 </Form.Item>
                 <Form.Item
-                  name={"last_name"}
-                  label={"Last Name"}
+                  name={'last_name'}
+                  label={'Last Name'}
                   required
                   rules={[
                     {
                       required: true,
-                      message: "Please input your last name!",
+                      message: 'Please input your last name!',
                     },
                   ]}
                 >
-                  <Input placeholder={"Last Name"} />
+                  <Input placeholder={'Last Name'} />
                 </Form.Item>
                 <Form.Item
-                  name={"email"}
-                  label={"Email Address"}
+                  name={'email'}
+                  label={'Email Address'}
                   required
                   rules={[
                     {
                       required: true,
-                      message: "Please input your email!",
+                      message: 'Please input your email!',
                     },
                     {
-                      type: "email",
-                      message: "Please enter a valid email address",
+                      type: 'email',
+                      message: 'Please enter a valid email address',
                     },
                     {
                       max: 255,
-                      message: "Email is too long",
+                      message: 'Email is too long',
                     },
                   ]}
                 >
                   <Input
-                    status={emailWarning ? "warning" : ""}
-                    prefix={<MailFilled style={{ color: "rgba(0,0,0,.25)" }} />}
-                    placeholder={"Email"}
+                    status={emailWarning ? 'warning' : ''}
+                    prefix={<MailFilled style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    placeholder={'Email'}
                   />
                 </Form.Item>
                 <Form.Item
-                  name={"username"}
-                  label={"username"}
+                  name={'username'}
+                  label={'username'}
                   required
                   rules={[
                     {
                       required: true,
-                      message: "Please input your username!",
+                      message: 'Please input your username!',
                     },
                   ]}
                 >
                   <Input
-                    status={usernameWarning ? "warning" : ""}
+                    status={usernameWarning ? 'warning' : ''}
                     prefix={
-                      <UserOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+                      <UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />
                     }
-                    placeholder={"Username"}
+                    placeholder={'Username'}
                   />
                 </Form.Item>
                 <Form.Item
-                  name={"password"}
-                  label={"Password"}
+                  name={'password'}
+                  label={'Password'}
                   required
                   rules={[
                     {
                       required: true,
-                      message: "Please input your password!",
+                      message: 'Please input your password!',
                     },
                     {
                       min: 6,
-                      message: "Password must be at least 6 characters long",
+                      message: 'Password must be at least 6 characters long',
                     },
                   ]}
                 >
                   <Input.Password
                     prefix={
-                      <KeyOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+                      <KeyOutlined style={{ color: 'rgba(0,0,0,.25)' }} />
                     }
-                    placeholder={"password"}
+                    placeholder={'password'}
                   />
                 </Form.Item>
 
                 <Form.Item
-                  name="confirmPassword"
-                  label="Confirm Password"
+                  name='confirmPassword'
+                  label='Confirm Password'
                   required
-                  dependencies={["password"]}
+                  dependencies={['password']}
                   hasFeedback
                   rules={[
                     {
                       required: true,
-                      message: "Please confirm your password!",
+                      message: 'Please confirm your password!',
                     },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
-                        if (!value || getFieldValue("password") === value) {
+                        if (!value || getFieldValue('password') === value) {
                           return Promise.resolve();
                         }
                         return Promise.reject(
-                          new Error("The two passwords do not match!")
+                          new Error('The two passwords do not match!')
                         );
                       },
                     }),
@@ -255,40 +257,44 @@ const UserRegister = () => {
                 >
                   <Input.Password
                     prefix={
-                      <KeyOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+                      <KeyOutlined style={{ color: 'rgba(0,0,0,.25)' }} />
                     }
-                    placeholder="Confirm Password"
+                    placeholder='Confirm Password'
                   />
                 </Form.Item>
                 <Form.Item>
                   <Button
                     loading={isLoading}
-                    className="custom-button"
+                    className='custom-button'
                     style={{
-                      fontSize: "18px",
+                      fontSize: '18px',
                     }}
                     block
-                    htmlType="submit"
+                    htmlType='submit'
                   >
                     Submit
                   </Button>
                 </Form.Item>
-                <Form.Item style={{ marginTop: "11px" }}>
+                <Form.Item style={{ marginTop: '11px' }}>
                   <Typography.Text
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
                     }}
                   >
                     Already have an account?
-                    <span style={{ marginLeft: "3px" }}>
-                      <Link to={"/login"}> Login now</Link>
+                    <span style={{ marginLeft: '3px' }}>
+                      <Link to={'/login'}> Login now</Link>
                     </span>
                   </Typography.Text>
                 </Form.Item>
               </Form>
-              <div className="register-image">
-                <Image preview={false} src={RegisterImage} width={300}></Image>
+              <div className='register-image'>
+                <Image
+                  preview={false}
+                  src={RegisterImage}
+                  width={300}
+                ></Image>
               </div>
             </div>
           </Spin>

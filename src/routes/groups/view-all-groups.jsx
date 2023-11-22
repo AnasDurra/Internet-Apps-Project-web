@@ -2,16 +2,17 @@ import { Button, Col, Row, Space, Table, Tag, Typography } from 'antd';
 import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { IoMdAdd } from 'react-icons/io';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Title from 'antd/es/typography/Title';
-import EditAccessModal from './modal-edit-access';
+import EditAccessModal from './modal-edit-group';
 import NewGroupModal from './modal-new-group';
 import { useNavigate } from 'react-router-dom';
 import '/src/routes/groups/zstyle.css';
-import { useGetQuery } from '../../app/services/folders';
+import { useGetFoldersQuery } from '../../app/services/folders';
+import { LuFolderCog } from 'react-icons/lu';
 
 export default function ViewAllGroups() {
-  const { data: folders, isLoading, isError } = useGetQuery();
+  const { data: folders, isLoading, isError } = useGetFoldersQuery();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] = useState(false);
@@ -60,7 +61,7 @@ export default function ViewAllGroups() {
     },
     {
       title: 'Owner',
-      dataIndex: ['owner','username'],
+      dataIndex: 'owner',
       key: 'owner',
       width: '20%',
       render: (text) => text,
@@ -68,7 +69,7 @@ export default function ViewAllGroups() {
 
     {
       title: 'Last Updated',
-      dataIndex: 'updated_at',
+      dataIndex: 'lastUpdated',
       key: 'lastUpdated',
       width: '20%',
 
@@ -87,8 +88,8 @@ export default function ViewAllGroups() {
                   setIsEditAccessModalOpen(true);
                 }}
               >
-                <MdManageAccounts
-                  size={'2em'}
+                <LuFolderCog
+                  size={'1.5em'}
                   color='grey'
                 />
               </a>
@@ -100,7 +101,7 @@ export default function ViewAllGroups() {
                 }}
               >
                 <MdOutlineDeleteOutline
-                  size={'2em'}
+                  size={'1.5em'}
                   color='#ff7875'
                 />
               </a>
@@ -134,10 +135,6 @@ export default function ViewAllGroups() {
     },
   ];
 
-  useEffect(() => {
-    console.log('fodlers', folders);
-  }, [folders]);
-
   return (
     <div>
       <Row style={{ marginBottom: '1rem' }}>
@@ -160,7 +157,7 @@ export default function ViewAllGroups() {
           rowClassName={() => 'row'}
           style={{ width: '100%' }}
           columns={columns}
-          dataSource={folders}
+          dataSource={data}
           rowSelection={rowSelection}
           onRow={(record, rowIndex) => {
             return {

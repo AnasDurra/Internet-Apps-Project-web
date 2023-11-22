@@ -1,14 +1,12 @@
-import { Button, Col, Row, Space, Table, Tag, Typography, theme } from 'antd';
-import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
-import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
-import { AiOutlineFile, AiTwotoneLock, AiTwotoneUnlock } from 'react-icons/ai';
+import { Button, Col, Row, Table, Typography, theme } from 'antd';
+import { MdOutlineDeleteOutline } from 'react-icons/md';
+import { AiOutlineFile, AiTwotoneLock } from 'react-icons/ai';
 import { BsFileEarmarkLockFill, BsFillUnlockFill } from 'react-icons/bs';
 import { IoMdAdd } from 'react-icons/io';
 import { useState } from 'react';
-import Title from 'antd/es/typography/Title';
-import EditAccessModal from './modal-edit-access';
-import NewGroupModal from './modal-new-group';
 import NewFileModal from './modal-new-file';
+import LargeMultiSelectButtons from './large-multi-select-buttons';
+import { LuFileEdit } from 'react-icons/lu';
 
 const { useToken } = theme;
 
@@ -17,10 +15,7 @@ export default function ViewOneGroup() {
   const [myCheckedInSelectedRowKeys, setMyCheckedInSelectedRowKeys] = useState(
     []
   );
-
-  const [isEditAccessModalOpen, setIsEditAccessModalOpen] = useState(false);
   const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
-  const { token } = useToken();
 
   const freeToUseRowSelection = {
     freeToUseSelectedRowKeys,
@@ -156,9 +151,7 @@ export default function ViewOneGroup() {
               <Row justify={'space-evenly'}>
                 <Col>
                   <a
-                    onClick={() => {
-                      setIsEditAccessModalOpen(true);
-                    }}
+                    onClick={() => {}}
                     style={{ color: 'black' }}
                   >
                     <div
@@ -184,12 +177,8 @@ export default function ViewOneGroup() {
                 </Col>
 
                 <Col>
-                  <a
-                    onClick={() => {
-                      setIsEditAccessModalOpen(true);
-                    }}
-                  >
-                    <MdManageAccounts
+                  <a onClick={() => {}}>
+                    <LuFileEdit
                       size={'1.5em'}
                       color='grey'
                     />
@@ -266,9 +255,7 @@ export default function ViewOneGroup() {
               >
                 <Col>
                   <a
-                    onClick={() => {
-                      setIsEditAccessModalOpen(true);
-                    }}
+                    onClick={() => {}}
                     style={{ color: 'black' }}
                   >
                     <div
@@ -294,12 +281,8 @@ export default function ViewOneGroup() {
                 </Col>
 
                 <Col>
-                  <a
-                    onClick={() => {
-                      setIsEditAccessModalOpen(true);
-                    }}
-                  >
-                    <MdManageAccounts
+                  <a onClick={() => {}}>
+                    <LuFileEdit
                       size={'1.5em'}
                       color='grey'
                     />
@@ -582,76 +565,10 @@ export default function ViewOneGroup() {
               rowSelection={freeToUseRowSelection}
             />
           ) : (
-            <>
-              <Row
-                justify={'center'}
-                align={'middle'}
-                style={{ height: '50%' }}
-              >
-                <Col span={12}>
-                  <Button
-                    style={{
-                      width: '100%',
-                      borderRadius: '1em',
-                      height: '100%',
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 0.5em',
-                      backgroundColor: '#fafafa',
-                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                    }}
-                  >
-                    <Typography.Text
-                      style={{
-                        marginRight: '0.5em',
-                        width: '40%',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Check-in{' '}
-                    </Typography.Text>
-
-                    <AiTwotoneLock
-                      size={'3em'}
-                      color='grey'
-                    />
-                  </Button>
-
-                  <Button
-                    style={{
-                      width: '100%',
-                      borderRadius: '1em',
-                      height: '100%',
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 0.5em',
-                      backgroundColor: '#fafafa',
-                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                      marginTop: '2em',
-                    }}
-                  >
-                    <Typography.Text
-                      style={{
-                        marginRight: '0.5em',
-                        width: '40%',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Delete{' '}
-                    </Typography.Text>
-
-                    <MdOutlineDeleteOutline
-                      size={'3em'}
-                      color='#ff7875'
-                    />
-                  </Button>
-                </Col>
-              </Row>
-            </>
+            <LargeMultiSelectButtons
+              onCheckInClick={() => {}}
+              onDeleteClick={() => {}}
+            />
           )}
         </Col>
 
@@ -679,91 +596,18 @@ export default function ViewOneGroup() {
                     columns={othersCheckedInColumns}
                     dataSource={data}
                     size='small'
-
-                    // rowSelection={rowSelection}
                   />
                 </Row>
               )}
             </>
           ) : (
-            <>
-              <Row
-                justify={'center'}
-                align={'middle'}
-                style={{ height: '50%' }}
-              >
-                <Col span={12}>
-                  <Button
-                    style={{
-                      width: '100%',
-                      borderRadius: '1em',
-                      height: '100%',
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 0.5em',
-                      backgroundColor: '#fafafa',
-                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                    }}
-                  >
-                    <Typography.Text
-                      style={{
-                        marginRight: '0.5em',
-                        width: '40%',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Check-in{' '}
-                    </Typography.Text>
-
-                    <AiTwotoneLock
-                      size={'3em'}
-                      color='grey'
-                    />
-                  </Button>
-
-                  <Button
-                    style={{
-                      width: '100%',
-                      borderRadius: '1em',
-                      height: '100%',
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 0.5em',
-                      backgroundColor: '#fafafa',
-                      boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)',
-                      marginTop: '2em',
-                    }}
-                  >
-                    <Typography.Text
-                      style={{
-                        marginRight: '0.5em',
-                        width: '40%',
-                        textAlign: 'center',
-                      }}
-                    >
-                      Delete{' '}
-                    </Typography.Text>
-
-                    <MdOutlineDeleteOutline
-                      size={'3em'}
-                      color='#ff7875'
-                    />
-                  </Button>
-                </Col>
-              </Row>
-            </>
+            <LargeMultiSelectButtons
+              onCheckInClick={() => {}}
+              onDeleteClick={() => {}}
+            />
           )}
         </Col>
       </Row>
-
-      <EditAccessModal
-        isOpen={isEditAccessModalOpen}
-        setOpen={setIsEditAccessModalOpen}
-      />
 
       <NewFileModal
         isOpen={isNewFileModalOpen}

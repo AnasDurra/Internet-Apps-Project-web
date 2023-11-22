@@ -1,21 +1,21 @@
 import { Button } from 'antd';
 import {
-  useLazySignupQuery,
   useLoginMutation,
   useLogoutMutation,
+  useSignupMutation,
 } from './app/services/auth';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 const dummyData = {
-  username: 'zal21azael121',
+  username: 'zal',
   password: '12341234',
   full_name: 'Alaa Zamel',
-  email: 'az1laaa3zame210@gmail.com',
+  email: 'az10@gmail.com',
 };
 
 export default function DummyPage() {
-  const [trigger, results] = useLazySignupQuery();
+  const [trigger, results] = useSignupMutation();
   const [trigger2, { data }] = useLoginMutation();
   const [trigger3] = useLogoutMutation();
 
@@ -25,6 +25,7 @@ export default function DummyPage() {
   }, [results.data]);
 
   useEffect(() => {
+    console.log('data tok', data?.accessToken);
     if (data?.accessToken) Cookies.set('accessToken', data?.accessToken);
   }, [data?.accessToken]);
 

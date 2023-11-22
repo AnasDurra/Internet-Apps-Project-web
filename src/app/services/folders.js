@@ -1,17 +1,15 @@
 import { apiSlice } from '../apiSlice';
 
 export const folders = apiSlice.injectEndpoints({
-  tagTypes: ['Folder'],
-
   endpoints: (builder) => ({
-    create: builder.query({
+    createFolder: builder.mutation({
       query: (data) => ({
         url: 'folders',
         method: 'POST',
         body: data,
       }),
       invalidatesTags: ['Folder'],
-    /*   async onCacheEntryAdded(
+      /*   async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
@@ -95,15 +93,15 @@ export const folders = apiSlice.injectEndpoints({
       }, */
     }),
 
-    get: builder.query({
+    getFolders: builder.query({
       query: () => ({
         url: 'folders',
-        method: 'get',
+        method: 'GET',
       }),
       providesTags: ['Folder'],
     }),
 
-    update: builder.mutation({
+    updateFolder: builder.mutation({
       query: (data) => ({
         url: `folders/${data.id}`,
         method: 'PATCH',
@@ -112,7 +110,7 @@ export const folders = apiSlice.injectEndpoints({
       invalidatesTags: ['Folder'],
     }),
 
-    delete: builder.mutation({
+    deleteFolder: builder.mutation({
       query: (id) => ({
         url: `folders/${id}`,
         method: 'DELETE',
@@ -123,10 +121,7 @@ export const folders = apiSlice.injectEndpoints({
 });
 
 export const {
-  useCreateQuery,
-  useDeleteMutation,
-  useGetQuery,
-  useLazyCreateQuery,
-  useLazyGetQuery,
-  useUpdateMutation,
+  useLazyGetFoldersQuery,
+  useCreateFolderMutation,
+  useGetFoldersQuery
 } = folders;

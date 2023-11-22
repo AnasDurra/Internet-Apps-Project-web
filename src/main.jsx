@@ -10,8 +10,8 @@ import ViewOneGroup from "./routes/groups/view-one-group.jsx";
 import store from "./app/store.js";
 import { Provider } from "react-redux";
 import DummyPage from "./dummy.jsx";
-import LoginPage from "./routes/groups/RegisterationPages/LoginPage.jsx";
-import UserRegister from "./routes/groups/RegisterationPages/UserRegister.jsx";
+import LoginPage from "./routes/RegisterationPages/LoginPage.jsx";
+import UserRegister from "./routes/RegisterationPages/UserRegister.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
