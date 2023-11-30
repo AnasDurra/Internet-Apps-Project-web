@@ -1,12 +1,22 @@
-import { Button, Col, Row, Table, Typography, theme } from 'antd';
-import { MdOutlineDeleteOutline } from 'react-icons/md';
-import { AiOutlineFile, AiTwotoneLock } from 'react-icons/ai';
-import { BsFileEarmarkLockFill, BsFillUnlockFill } from 'react-icons/bs';
-import { IoMdAdd } from 'react-icons/io';
-import { useState } from 'react';
-import NewFileModal from './modal-new-file';
-import LargeMultiSelectButtons from './large-multi-select-buttons';
-import { LuFileEdit } from 'react-icons/lu';
+import {
+  Button,
+  Col,
+  Modal,
+  Row,
+  Table,
+  Tooltip,
+  Typography,
+  theme,
+} from "antd";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { AiOutlineFile, AiTwotoneLock, AiOutlineHistory } from "react-icons/ai";
+import { BsFileEarmarkLockFill, BsFillUnlockFill } from "react-icons/bs";
+import { IoMdAdd } from "react-icons/io";
+import { useState } from "react";
+import NewFileModal from "./modal-new-file";
+import LargeMultiSelectButtons from "./large-multi-select-buttons";
+import ViewFileHistoryModal from "./modal-view-file-history";
+import { LuFileEdit } from "react-icons/lu";
 
 const { useToken } = theme;
 
@@ -16,31 +26,33 @@ export default function ViewOneGroup() {
     []
   );
   const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedFileHistoryId, setSelectedFileHistoryId] = useState(null);
 
   const freeToUseRowSelection = {
     freeToUseSelectedRowKeys,
-    columnWidth: '5%',
+    columnWidth: "5%",
     hideSelectAll: true,
     onChange: (newSelectedRowKeys) => {
       setFreeToUseSelectedRowKeys(newSelectedRowKeys);
     },
     getCheckboxProps: (record) => {
       return {
-        disabled: record.name == 'Public',
+        disabled: record.name == "Public",
       };
     },
   };
 
   const myCheckedInRowSelection = {
     myCheckedInSelectedRowKeys,
-    columnWidth: '5%',
+    columnWidth: "5%",
     hideSelectAll: true,
     onChange: (newSelectedRowKeys) => {
       setMyCheckedInSelectedRowKeys(newSelectedRowKeys);
     },
     getCheckboxProps: (record) => {
       return {
-        disabled: record.name == 'Public',
+        disabled: record.name == "Public",
       };
     },
   };
@@ -50,24 +62,21 @@ export default function ViewOneGroup() {
       title: <span> Currently Checked In (others)</span>,
       children: [
         {
-          width: '5%',
+          width: "5%",
         },
         {
-          title: <span style={{ marginLeft: '15%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '40%',
+          title: <span style={{ marginLeft: "15%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "40%",
 
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <BsFileEarmarkLockFill
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <BsFileEarmarkLockFill color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -75,26 +84,26 @@ export default function ViewOneGroup() {
           ),
         },
         {
-          title: 'Owner',
-          dataIndex: 'owner',
-          key: 'owner',
-          width: '20%',
+          title: "Owner",
+          dataIndex: "owner",
+          key: "owner",
+          width: "20%",
           render: (text) => text,
         },
 
         {
-          title: 'Last Updated',
-          dataIndex: 'lastUpdated',
-          key: 'lastUpdated',
-          width: '20%',
+          title: "Last Updated",
+          dataIndex: "lastUpdated",
+          key: "lastUpdated",
+          width: "20%",
 
           render: (text) => text,
         },
         {
-          title: 'checked-in-by',
-          dataIndex: 'owner',
-          key: 'owner',
-          width: '20%',
+          title: "checked-in-by",
+          dataIndex: "owner",
+          key: "owner",
+          width: "20%",
           render: (text) => text,
         },
       ],
@@ -105,21 +114,17 @@ export default function ViewOneGroup() {
       title: <span> Free To Use</span>,
       children: [
         {
-          title: <span style={{ marginLeft: '25%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '25%',
-
+          title: <span style={{ marginLeft: "25%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "25%",
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <AiOutlineFile
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <AiOutlineFile color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -127,69 +132,71 @@ export default function ViewOneGroup() {
           ),
         },
         {
-          title: 'Owner',
-          dataIndex: 'owner',
-          key: 'owner',
-          width: '15%',
+          title: "Owner",
+          dataIndex: "owner",
+          key: "owner",
+          width: "15%",
           render: (text) => text,
         },
 
         {
-          title: 'Last Updated',
-          dataIndex: 'lastUpdated',
-          key: 'lastUpdated',
-          width: '20%',
+          title: "Last Updated",
+          dataIndex: "lastUpdated",
+          key: "lastUpdated",
+          width: "20%",
 
           render: (text) => text,
         },
         {
-          key: 'action',
-          width: '30%',
+          key: "action",
+          width: "40%",
           render: (_, record) => {
             return !freeToUseSelectedRowKeys?.length &&
-              record.text != 'Public' ? (
-              <Row justify={'space-evenly'}>
+              record.text != "Public" ? (
+              <Row justify={"space-evenly"}>
                 <Col>
-                  <a
-                    onClick={() => {}}
-                    style={{ color: 'black' }}
-                  >
+                  <a onClick={() => {}} style={{ color: "black" }}>
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '2em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#f5f5f5',
-                        width: '100%',
-                        height: '1.8em',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "2em",
+                        padding: "0 0.5em",
+                        backgroundColor: "#f5f5f5",
+                        width: "100%",
+                        height: "1.8em",
                       }}
                     >
-                      <p style={{ marginRight: '0.5em' }}>check-in </p>
+                      <p style={{ marginRight: "0.5em" }}>check-in </p>
 
-                      <AiTwotoneLock
-                        size={'1.5em'}
-                        color='grey'
-                      />
+                      <AiTwotoneLock size={"1.5em"} color="grey" />
                     </div>
                   </a>
                 </Col>
 
                 <Col>
+                  <a
+                    onClick={() => {
+                      setSelectedFileHistoryId(record.key);
+
+                      setIsHistoryModalOpen(true);
+                    }}
+                  >
+                    <Tooltip title="Show the file hisory">
+                      <AiOutlineHistory size={"1.5em"} />
+                    </Tooltip>
+                  </a>
+                </Col>
+
+                <Col>
                   <a onClick={() => {}}>
-                    <LuFileEdit
-                      size={'1.5em'}
-                      color='grey'
-                    />
+                    <LuFileEdit size={"1.5em"} color="grey" />
                   </a>
                 </Col>
                 <Col>
                   <a onClick={() => {}}>
-                    <MdOutlineDeleteOutline
-                      size={'1.5em'}
-                      color='#ff7875'
-                    />
+                    <MdOutlineDeleteOutline size={"1.5em"} color="#ff7875" />
                   </a>
                 </Col>
               </Row>
@@ -206,21 +213,18 @@ export default function ViewOneGroup() {
       title: <span> Currently Checked In (me)</span>,
       children: [
         {
-          title: <span style={{ marginLeft: '20%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '25%',
+          title: <span style={{ marginLeft: "20%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "25%",
 
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <BsFileEarmarkLockFill
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <BsFileEarmarkLockFill color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -228,72 +232,71 @@ export default function ViewOneGroup() {
           ),
         },
         {
-          title: 'Owner',
-          dataIndex: 'owner',
-          key: 'owner',
-          width: '15%',
+          title: "Owner",
+          dataIndex: "owner",
+          key: "owner",
+          width: "15%",
           render: (text) => text,
         },
 
         {
-          title: 'Last Updated',
-          dataIndex: 'lastUpdated',
-          key: 'lastUpdated',
-          width: '20%',
+          title: "Last Updated",
+          dataIndex: "lastUpdated",
+          key: "lastUpdated",
+          width: "20%",
 
           render: (text) => text,
         },
         {
-          key: 'action',
-          width: '30%',
+          key: "action",
+          width: "40%",
           render: (_, record) => {
             return !myCheckedInSelectedRowKeys?.length &&
-              record.text != 'Public' ? (
-              <Row
-                gutter={8}
-                justify={'space-evenly'}
-              >
+              record.text != "Public" ? (
+              <Row gutter={8} justify={"space-evenly"}>
                 <Col>
-                  <a
-                    onClick={() => {}}
-                    style={{ color: 'black' }}
-                  >
+                  <a onClick={() => {}} style={{ color: "black" }}>
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '2em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#f5f5f5',
-                        width: '100%',
-                        height: '1.8em',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "2em",
+                        padding: "0 0.5em",
+                        backgroundColor: "#f5f5f5",
+                        width: "100%",
+                        height: "1.8em",
                       }}
                     >
-                      <p style={{ marginRight: '0.5em' }}>check-out </p>
+                      <p style={{ marginRight: "0.5em" }}>check-out </p>
 
-                      <BsFillUnlockFill
-                        size={'1.2em'}
-                        color='grey'
-                      />
+                      <BsFillUnlockFill size={"1.2em"} color="grey" />
                     </div>
                   </a>
                 </Col>
 
                 <Col>
+                  <a
+                    onClick={() => {
+                      setSelectedFileHistoryId(record.key);
+
+                      setIsHistoryModalOpen(true);
+                    }}
+                  >
+                    <Tooltip title="Show the file hisory">
+                      <AiOutlineHistory size={"1.5em"} />
+                    </Tooltip>
+                  </a>
+                </Col>
+
+                <Col>
                   <a onClick={() => {}}>
-                    <LuFileEdit
-                      size={'1.5em'}
-                      color='grey'
-                    />
+                    <LuFileEdit size={"1.5em"} color="grey" />
                   </a>
                 </Col>
                 <Col>
                   <a onClick={() => {}}>
-                    <MdOutlineDeleteOutline
-                      size={'1.5em'}
-                      color='#ff7875'
-                    />
+                    <MdOutlineDeleteOutline size={"1.5em"} color="#ff7875" />
                   </a>
                 </Col>
               </Row>
@@ -307,226 +310,226 @@ export default function ViewOneGroup() {
   ];
   const data = [
     {
-      key: '1',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: 1,
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '2',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: 2,
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '3',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 3,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '4',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: 4,
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '5',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: 5,
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '6',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 6,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '7',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: 7,
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '8',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: 8,
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '9',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 9,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '10',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 10,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: 'a11',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 11,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
 
     {
-      key: 'a12',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 12,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: 'a13',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: 13,
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
   ];
   const data2 = [
     {
-      key: '11',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "11",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '22',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "22",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '33',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "33",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '44',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "44",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '55',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "55",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '66',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "66",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '77',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "77",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '88',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "88",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '99',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "99",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
   ];
   const data3 = [
     {
-      key: '111',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "111",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '222',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "222",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '333',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "333",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '444',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "444",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '555',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "555",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '666',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "666",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
     {
-      key: '777',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
+      key: "777",
+      name: "Public",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["nice", "developer"],
     },
     {
-      key: '888',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
+      key: "888",
+      name: "Jim Green",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["loser"],
     },
     {
-      key: '999',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
+      key: "999",
+      name: "Joe Black",
+      lastUpdated: "12 April 2023",
+      owner: "Admin",
+      tags: ["cool", "teacher"],
     },
   ];
 
@@ -534,12 +537,12 @@ export default function ViewOneGroup() {
     <>
       {myCheckedInSelectedRowKeys?.length == 0 &&
         freeToUseSelectedRowKeys?.length == 0 && (
-          <Row style={{ marginBottom: '1rem' }}>
+          <Row style={{ marginBottom: "1rem" }}>
             <Col>
               <Button
-                type='primary'
+                type="primary"
                 icon={<IoMdAdd />}
-                size={'large'}
+                size={"large"}
                 onClick={() => {
                   setIsNewFileModalOpen(true);
                 }}
@@ -550,18 +553,15 @@ export default function ViewOneGroup() {
           </Row>
         )}
 
-      <Row
-        gutter={24}
-        style={{ height: '100%' }}
-      >
+      <Row gutter={24} style={{ height: "100%" }}>
         <Col span={12}>
           {myCheckedInSelectedRowKeys.length == 0 ? (
             <Table
-              pagination={{ pageSize: 10, position: ['bottomLeft'] }}
-              style={{ width: '100%' }}
+              pagination={{ pageSize: 10, position: ["bottomLeft"] }}
+              style={{ width: "100%" }}
               columns={freeToUseColumns}
               dataSource={data}
-              size='small'
+              size="small"
               rowSelection={freeToUseRowSelection}
             />
           ) : (
@@ -580,22 +580,22 @@ export default function ViewOneGroup() {
                   pagination={{
                     pageSize: myCheckedInSelectedRowKeys.length == 0 ? 3 : 9,
                   }}
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   columns={myCheckedInColumns}
                   dataSource={data2}
-                  size='small'
+                  size="small"
                   rowSelection={myCheckedInRowSelection}
                 />
               </Row>
 
               {myCheckedInSelectedRowKeys.length == 0 && (
-                <Row style={{ marginTop: '0em' }}>
+                <Row style={{ marginTop: "0em" }}>
                   <Table
                     pagination={{ pageSize: 3 }}
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                     columns={othersCheckedInColumns}
                     dataSource={data}
-                    size='small'
+                    size="small"
                   />
                 </Row>
               )}
@@ -612,6 +612,11 @@ export default function ViewOneGroup() {
       <NewFileModal
         isOpen={isNewFileModalOpen}
         setOpen={setIsNewFileModalOpen}
+      />
+      <ViewFileHistoryModal
+        isHistoryModalOpen={isHistoryModalOpen}
+        setIsHistoryModalOpen={setIsHistoryModalOpen}
+        file_id={selectedFileHistoryId}
       />
     </>
   );

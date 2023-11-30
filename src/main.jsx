@@ -12,6 +12,7 @@ import { Provider } from "react-redux";
 import DummyPage from "./dummy.jsx";
 import LoginPage from "./routes/RegisterationPages/LoginPage.jsx";
 import UserRegister from "./routes/RegisterationPages/UserRegister.jsx";
+import UserFilesHistory from "./routes/AppHeader/Pages/UserFilesHistory.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <UserRegister />,
+      },
+      {
+        path: "/user-files-history",
+        element: <UserFilesHistory />,
       },
     ],
   },
