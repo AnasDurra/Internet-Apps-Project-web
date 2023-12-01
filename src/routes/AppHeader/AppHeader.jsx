@@ -3,15 +3,24 @@ import {
   SettingFilled,
   UserAddOutlined,
   UserOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import { Header } from "antd/es/layout/layout";
 import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { AiOutlineHistory } from "react-icons/ai";
 
 const AppHeader = () => {
   const navigate = useNavigate();
-  const HeaderItems = [{ url: "configurations", title: "Configurations" }];
+  const HeaderItems = [
+    { url: "configurations", title: "Configurations", icon: <SettingFilled /> },
+    {
+      url: "user-files-history",
+      title: "User Files History",
+      icon: <HistoryOutlined />,
+    },
+  ];
   const [selectedItem, setSelectedItem] = useState("Login");
   return (
     <div>
@@ -35,7 +44,7 @@ const AppHeader = () => {
           }}
           items={HeaderItems.map((item) => {
             return {
-              icon: item.url === "configurations" ? <SettingFilled /> : false,
+              icon: item.icon ?? false,
               key: item.url,
               label: item.title,
               className: "menu-item",

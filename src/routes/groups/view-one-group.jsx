@@ -5,12 +5,12 @@ import {
   Row,
   Spin,
   Table,
+  Tooltip,
   Typography,
   message,
-  theme,
 } from 'antd';
 import { MdOutlineDeleteOutline } from 'react-icons/md';
-import { AiOutlineFile, AiTwotoneLock } from 'react-icons/ai';
+import { AiOutlineFile, AiOutlineHistory, AiTwotoneLock } from 'react-icons/ai';
 import { BsFileEarmarkLockFill, BsFillUnlockFill } from 'react-icons/bs';
 import { IoMdAdd } from 'react-icons/io';
 import { useEffect, useState } from 'react';
@@ -28,8 +28,9 @@ import moment from 'moment';
 import { getLoggedInUser } from '../../app/services/auth';
 import { successMessage } from '../../components/messages.api';
 import EditFileModal from './modal-edit-file';
+import ViewFileHistoryModal from "./modal-view-file-history";
 
-const { useToken } = theme;
+
 
 export default function ViewOneGroup() {
   const { group_id } = useParams();
@@ -38,6 +39,8 @@ export default function ViewOneGroup() {
   const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
   const [isEditFileModalOpen, setIsEditFileModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedFileHistoryId, setSelectedFileHistoryId] = useState(null);
 
   const { data: files, isLoading: isFilesLoading } =
     useGetFilesInFolderQuery(group_id);
@@ -57,7 +60,7 @@ export default function ViewOneGroup() {
         duration: 0,
       });
     } else messageApi.destroy();
-  }, [isCheckInFileLoading]);
+  }, [isCheckInFileLoading,messageApi]);
 
   useEffect(() => {
     if (isCheckOutFileLoading) {
@@ -66,7 +69,8 @@ export default function ViewOneGroup() {
         content: 'checking Out..',
       });
     } else messageApi.destroy();
-  }, [isCheckOutFileLoading]);
+  }, [isCheckOutFileLoading,messageApi]);
+  
 
   const freeToUseRowSelection = {
     selectedRowKeys: freeToUseSelectedRowKeys,
@@ -77,7 +81,7 @@ export default function ViewOneGroup() {
 
     getCheckboxProps: (record) => {
       return {
-        disabled: record.name == 'Public',
+        disabled: record.name == "Public",
       };
     },
   };
@@ -87,24 +91,21 @@ export default function ViewOneGroup() {
       title: <span> Currently Checked In (others)</span>,
       children: [
         {
-          width: '5%',
+          width: "5%",
         },
         {
-          title: <span style={{ marginLeft: '15%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '40%',
+          title: <span style={{ marginLeft: "15%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "40%",
 
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <BsFileEarmarkLockFill
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <BsFileEarmarkLockFill color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -141,21 +142,17 @@ export default function ViewOneGroup() {
       title: <span> Free To Use</span>,
       children: [
         {
-          title: <span style={{ marginLeft: '25%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '25%',
-
+          title: <span style={{ marginLeft: "25%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "25%",
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <AiOutlineFile
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <AiOutlineFile color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -179,12 +176,12 @@ export default function ViewOneGroup() {
           render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
         },
         {
-          key: 'action',
-          width: '30%',
+          key: "action",
+          width: "40%",
           render: (_, record) => {
             return !freeToUseSelectedRowKeys?.length &&
-              record.text != 'Public' ? (
-              <Row justify={'space-evenly'}>
+              record.text != "Public" ? (
+              <Row justify={"space-evenly"}>
                 <Col>
                   <a
                     onClick={() => {
@@ -202,23 +199,34 @@ export default function ViewOneGroup() {
                   >
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '2em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#f5f5f5',
-                        width: '100%',
-                        height: '1.8em',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "2em",
+                        padding: "0 0.5em",
+                        backgroundColor: "#f5f5f5",
+                        width: "100%",
+                        height: "1.8em",
                       }}
                     >
-                      <p style={{ marginRight: '0.5em' }}>check-in </p>
+                      <p style={{ marginRight: "0.5em" }}>check-in </p>
 
-                      <AiTwotoneLock
-                        size={'1.5em'}
-                        color='grey'
-                      />
+                      <AiTwotoneLock size={"1.5em"} color="grey" />
                     </div>
+                  </a>
+                </Col>
+
+                <Col>
+                  <a
+                    onClick={() => {
+                      setSelectedFileHistoryId(record.key);
+
+                      setIsHistoryModalOpen(true);
+                    }}
+                  >
+                    <Tooltip title="Show the file hisory">
+                      <AiOutlineHistory size={"1.5em"} />
+                    </Tooltip>
                   </a>
                 </Col>
 
@@ -228,6 +236,11 @@ export default function ViewOneGroup() {
                       size={'1.5em'}
                       color='grey'
                     />
+                  </a>
+                </Col>
+                <Col>
+                  <a onClick={() => {}}>
+                    <LuFileEdit size={"1.5em"} color="grey" />
                   </a>
                 </Col> */}
                 <Col>
@@ -267,21 +280,18 @@ export default function ViewOneGroup() {
       title: <span> Currently Checked In (me)</span>,
       children: [
         {
-          title: <span style={{ marginLeft: '20%' }}>File name</span>,
-          dataIndex: 'name',
-          key: 'name',
-          width: '25%',
+          title: <span style={{ marginLeft: "20%" }}>File name</span>,
+          dataIndex: "name",
+          key: "name",
+          width: "25%",
 
           render: (text) => (
             <div>
               <Row gutter={16}>
                 <Col>
-                  <BsFileEarmarkLockFill
-                    color='#003eb3'
-                    size={'2em'}
-                  />
+                  <BsFileEarmarkLockFill color="#003eb3" size={"2em"} />
                 </Col>
-                <Col style={{ marginBlock: 'auto' }}>
+                <Col style={{ marginBlock: "auto" }}>
                   <Typography.Text>{text}</Typography.Text>
                 </Col>
               </Row>
@@ -305,8 +315,8 @@ export default function ViewOneGroup() {
           render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
         },
         {
-          key: 'action',
-          width: '30%',
+          key: "action",
+          width: "40%",
           render: (_, record) => {
             return (
               <Row
@@ -328,23 +338,34 @@ export default function ViewOneGroup() {
                   >
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '2em',
-                        padding: '0 0.5em',
-                        backgroundColor: '#f5f5f5',
-                        width: '100%',
-                        height: '1.8em',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "2em",
+                        padding: "0 0.5em",
+                        backgroundColor: "#f5f5f5",
+                        width: "100%",
+                        height: "1.8em",
                       }}
                     >
-                      <p style={{ marginRight: '0.5em' }}>check-out </p>
+                      <p style={{ marginRight: "0.5em" }}>check-out </p>
 
-                      <BsFillUnlockFill
-                        size={'1.2em'}
-                        color='grey'
-                      />
+                      <BsFillUnlockFill size={"1.2em"} color="grey" />
                     </div>
+                  </a>
+                </Col>
+
+                <Col>
+                  <a
+                    onClick={() => {
+                      setSelectedFileHistoryId(record.key);
+
+                      setIsHistoryModalOpen(true);
+                    }}
+                  >
+                    <Tooltip title="Show the file hisory">
+                      <AiOutlineHistory size={"1.5em"} />
+                    </Tooltip>
                   </a>
                 </Col>
 
@@ -411,10 +432,7 @@ export default function ViewOneGroup() {
         </Row>
       )}
 
-      <Row
-        gutter={24}
-        style={{ height: '100%' }}
-      >
+      <Row gutter={24} style={{ height: "100%" }}>
         <Col span={12}>
           <Table
             pagination={{ pageSize: 10, position: ['bottomLeft'] }}
@@ -436,7 +454,7 @@ export default function ViewOneGroup() {
                   pagination={{
                     pageSize: 3,
                   }}
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   columns={myCheckedInColumns}
                   dataSource={files
                     ?.filter(
@@ -498,12 +516,19 @@ export default function ViewOneGroup() {
         file={selectedFile}
       />
 
+<ViewFileHistoryModal
+        isHistoryModalOpen={isHistoryModalOpen}
+        setIsHistoryModalOpen={setIsHistoryModalOpen}
+        file_id={selectedFileHistoryId}
+      />
+
       <Spin
         spinning={isFilesLoading}
         fullscreen
       />
 
       {contextHolder}
+     
     </>
   );
 }

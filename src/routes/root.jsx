@@ -9,7 +9,7 @@ export default function Root() {
       <AppHeader />
       <Content
         style={{
-          padding: "2% 5%",
+          padding: "1% 5%", // keep it 1% please
           backgroundColor: "#fdfdfd",
           minHeight: "82vh",
         }}

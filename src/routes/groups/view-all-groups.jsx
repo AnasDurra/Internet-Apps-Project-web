@@ -40,20 +40,20 @@ export default function ViewAllGroups() {
   };
   const rowSelection = {
     selectedRowKeys,
-    columnWidth: '5%',
+    columnWidth: "5%",
     onChange: onSelectChange,
     getCheckboxProps: (record) => {
       return {
-        disabled: record.name == 'Public',
+        disabled: record.name == "Public",
       };
     },
   };
 
   const columns = [
     {
-      dataIndex: 'name',
-      key: 'name',
-      width: '40%',
+      dataIndex: "name",
+      key: "name",
+      width: "40%",
       render: (text) => (
         <div>
           <Row gutter={16}>
@@ -68,7 +68,7 @@ export default function ViewAllGroups() {
                 <Typography.Text>{text}</Typography.Text>
               </Row>
               <Row>
-                <Typography.Text type='secondary'>(12 Files)</Typography.Text>
+                <Typography.Text type="secondary">(12 Files)</Typography.Text>
               </Row>
             </Col>
           </Row>
@@ -91,10 +91,10 @@ export default function ViewAllGroups() {
       render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
     },
     {
-      key: 'action',
-      width: '20%',
+      key: "action",
+      width: "20%",
       render: (_, record) => {
-        return !selectedRowKeys?.length && record.text != 'Public' ? (
+        return !selectedRowKeys?.length && record.text != "Public" ? (
           <Row gutter={16}>
             <Col offset={8}>
               <a
@@ -104,10 +104,7 @@ export default function ViewAllGroups() {
                   setIsEditGroupModalOpen(true);
                 }}
               >
-                <LuFolderCog
-                  size={'1.5em'}
-                  color='grey'
-                />
+                <LuFolderCog size={"1.5em"} color="grey" />
               </a>
             </Col>
             <Col>
@@ -137,12 +134,12 @@ export default function ViewAllGroups() {
 
   return (
     <div>
-      <Row style={{ marginBottom: '1rem' }}>
+      <Row style={{ marginBottom: "1rem" }}>
         <Col>
           <Button
-            type='primary'
+            type="primary"
             icon={<IoMdAdd />}
-            size={'large'}
+            size={"large"}
             onClick={() => {
               setIsNewGroupModalOpen(true);
             }}
@@ -154,8 +151,8 @@ export default function ViewAllGroups() {
 
       <Row>
         <Table
-          rowClassName={() => 'row'}
-          style={{ width: '100%' }}
+          rowClassName={() => "row"}
+          style={{ width: "100%" }}
           columns={columns}
           dataSource={folders}
           rowSelection={rowSelection}
