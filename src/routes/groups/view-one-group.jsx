@@ -1,43 +1,80 @@
-import { Button, Col, Row, Table, Typography, theme } from 'antd';
+import {
+  Button,
+  Col,
+  Popconfirm,
+  Row,
+  Spin,
+  Table,
+  Typography,
+  message,
+  theme,
+} from 'antd';
 import { MdOutlineDeleteOutline } from 'react-icons/md';
 import { AiOutlineFile, AiTwotoneLock } from 'react-icons/ai';
 import { BsFileEarmarkLockFill, BsFillUnlockFill } from 'react-icons/bs';
 import { IoMdAdd } from 'react-icons/io';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NewFileModal from './modal-new-file';
 import LargeMultiSelectButtons from './large-multi-select-buttons';
 import { LuFileEdit } from 'react-icons/lu';
+import { useParams } from 'react-router-dom';
+import {
+  useCheckInFilesMutation,
+  useCheckOutFileMutation,
+  useDeleteFileMutation,
+  useGetFilesInFolderQuery,
+} from '../../app/services/files';
+import moment from 'moment';
+import { getLoggedInUser } from '../../app/services/auth';
+import { successMessage } from '../../components/messages.api';
+import EditFileModal from './modal-edit-file';
 
 const { useToken } = theme;
 
 export default function ViewOneGroup() {
+  const { group_id } = useParams();
+
   const [freeToUseSelectedRowKeys, setFreeToUseSelectedRowKeys] = useState([]);
-  const [myCheckedInSelectedRowKeys, setMyCheckedInSelectedRowKeys] = useState(
-    []
-  );
   const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
+  const [isEditFileModalOpen, setIsEditFileModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState();
+
+  const { data: files, isLoading: isFilesLoading } =
+    useGetFilesInFolderQuery(group_id);
+  const [checkInFiles, { isLoading: isCheckInFileLoading }] =
+    useCheckInFilesMutation();
+  const [checkOutFile, { isLoading: isCheckOutFileLoading }] =
+    useCheckOutFileMutation();
+  const [deleteFile] = useDeleteFileMutation();
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    if (isCheckInFileLoading) {
+      messageApi.open({
+        type: 'loading',
+        content: 'checking In..',
+        duration: 0,
+      });
+    } else messageApi.destroy();
+  }, [isCheckInFileLoading]);
+
+  useEffect(() => {
+    if (isCheckOutFileLoading) {
+      messageApi.open({
+        type: 'loading',
+        content: 'checking Out..',
+      });
+    } else messageApi.destroy();
+  }, [isCheckOutFileLoading]);
 
   const freeToUseRowSelection = {
-    freeToUseSelectedRowKeys,
+    selectedRowKeys: freeToUseSelectedRowKeys,
     columnWidth: '5%',
-    hideSelectAll: true,
     onChange: (newSelectedRowKeys) => {
       setFreeToUseSelectedRowKeys(newSelectedRowKeys);
     },
-    getCheckboxProps: (record) => {
-      return {
-        disabled: record.name == 'Public',
-      };
-    },
-  };
 
-  const myCheckedInRowSelection = {
-    myCheckedInSelectedRowKeys,
-    columnWidth: '5%',
-    hideSelectAll: true,
-    onChange: (newSelectedRowKeys) => {
-      setMyCheckedInSelectedRowKeys(newSelectedRowKeys);
-    },
     getCheckboxProps: (record) => {
       return {
         disabled: record.name == 'Public',
@@ -76,7 +113,7 @@ export default function ViewOneGroup() {
         },
         {
           title: 'Owner',
-          dataIndex: 'owner',
+          dataIndex: ['owner', 'username'],
           key: 'owner',
           width: '20%',
           render: (text) => text,
@@ -84,15 +121,14 @@ export default function ViewOneGroup() {
 
         {
           title: 'Last Updated',
-          dataIndex: 'lastUpdated',
+          dataIndex: 'updated_at',
           key: 'lastUpdated',
           width: '20%',
-
-          render: (text) => text,
+          render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
         },
         {
           title: 'checked-in-by',
-          dataIndex: 'owner',
+          dataIndex: ['owner', 'username'],
           key: 'owner',
           width: '20%',
           render: (text) => text,
@@ -128,7 +164,7 @@ export default function ViewOneGroup() {
         },
         {
           title: 'Owner',
-          dataIndex: 'owner',
+          dataIndex: ['owner', 'username'],
           key: 'owner',
           width: '15%',
           render: (text) => text,
@@ -136,11 +172,11 @@ export default function ViewOneGroup() {
 
         {
           title: 'Last Updated',
-          dataIndex: 'lastUpdated',
+          dataIndex: 'updated_at',
           key: 'lastUpdated',
           width: '20%',
 
-          render: (text) => text,
+          render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
         },
         {
           key: 'action',
@@ -151,7 +187,17 @@ export default function ViewOneGroup() {
               <Row justify={'space-evenly'}>
                 <Col>
                   <a
-                    onClick={() => {}}
+                    onClick={() => {
+                      checkInFiles([record.id])
+                        .unwrap()
+                        .then(() => {
+                          setFreeToUseSelectedRowKeys([]);
+
+                          successMessage({
+                            content: 'File Checked In Successfully',
+                          });
+                        });
+                    }}
                     style={{ color: 'black' }}
                   >
                     <div
@@ -176,21 +222,36 @@ export default function ViewOneGroup() {
                   </a>
                 </Col>
 
-                <Col>
+                {/* <Col>
                   <a onClick={() => {}}>
                     <LuFileEdit
                       size={'1.5em'}
                       color='grey'
                     />
                   </a>
-                </Col>
+                </Col> */}
                 <Col>
-                  <a onClick={() => {}}>
-                    <MdOutlineDeleteOutline
-                      size={'1.5em'}
-                      color='#ff7875'
-                    />
-                  </a>
+                  <Popconfirm
+                    title='Delete the file'
+                    description='Are you sure to delete this file?'
+                    onConfirm={(event) => {
+                      deleteFile(record.id)
+                        .unwrap()
+                        .then(() => {
+                          successMessage({ content: 'File Deleted' });
+                        });
+                      event.stopPropagation();
+                    }}
+                    okText='Yes'
+                    cancelText='No'
+                  >
+                    <a>
+                      <MdOutlineDeleteOutline
+                        size={'1.5em'}
+                        color='#ff7875'
+                      />
+                    </a>
+                  </Popconfirm>
                 </Col>
               </Row>
             ) : (
@@ -229,7 +290,7 @@ export default function ViewOneGroup() {
         },
         {
           title: 'Owner',
-          dataIndex: 'owner',
+          dataIndex: ['owner', 'username'],
           key: 'owner',
           width: '15%',
           render: (text) => text,
@@ -237,25 +298,32 @@ export default function ViewOneGroup() {
 
         {
           title: 'Last Updated',
-          dataIndex: 'lastUpdated',
+          dataIndex: 'updated_at',
           key: 'lastUpdated',
           width: '20%',
 
-          render: (text) => text,
+          render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
         },
         {
           key: 'action',
           width: '30%',
           render: (_, record) => {
-            return !myCheckedInSelectedRowKeys?.length &&
-              record.text != 'Public' ? (
+            return (
               <Row
                 gutter={8}
                 justify={'space-evenly'}
               >
                 <Col>
                   <a
-                    onClick={() => {}}
+                    onClick={() => {
+                      checkOutFile(record.id)
+                        .unwrap()
+                        .then(() => {
+                          successMessage({
+                            content: 'File Checked out Successfully',
+                          });
+                        });
+                    }}
                     style={{ color: 'black' }}
                   >
                     <div
@@ -281,7 +349,13 @@ export default function ViewOneGroup() {
                 </Col>
 
                 <Col>
-                  <a onClick={() => {}}>
+                  <a
+                    onClick={() => {
+                      setSelectedFile(record);
+                      console.log('record', record);
+                      setIsEditFileModalOpen(true);
+                    }}
+                  >
                     <LuFileEdit
                       size={'1.5em'}
                       color='grey'
@@ -289,287 +363,69 @@ export default function ViewOneGroup() {
                   </a>
                 </Col>
                 <Col>
-                  <a onClick={() => {}}>
-                    <MdOutlineDeleteOutline
-                      size={'1.5em'}
-                      color='#ff7875'
-                    />
-                  </a>
+                  <Popconfirm
+                    title='Delete the file'
+                    description='Are you sure to delete this file?'
+                    onConfirm={(event) => {
+                      deleteFile(record.id)
+                        .unwrap()
+                        .then(() => {
+                          successMessage({ content: 'File Deleted' });
+                        });
+                      event.stopPropagation();
+                    }}
+                    okText='Yes'
+                    cancelText='No'
+                  >
+                    <a>
+                      <MdOutlineDeleteOutline
+                        size={'1.5em'}
+                        color='#ff7875'
+                      />
+                    </a>
+                  </Popconfirm>
                 </Col>
               </Row>
-            ) : (
-              <></>
             );
           },
         },
       ],
     },
   ];
-  const data = [
-    {
-      key: '1',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '4',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '5',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '6',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '7',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '8',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '9',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '10',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: 'a11',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-
-    {
-      key: 'a12',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: 'a13',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-  const data2 = [
-    {
-      key: '11',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '22',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '33',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '44',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '55',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '66',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '77',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '88',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '99',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-  const data3 = [
-    {
-      key: '111',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '222',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '333',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '444',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '555',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '666',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '777',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '888',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '999',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-
   return (
     <>
-      {myCheckedInSelectedRowKeys?.length == 0 &&
-        freeToUseSelectedRowKeys?.length == 0 && (
-          <Row style={{ marginBottom: '1rem' }}>
-            <Col>
-              <Button
-                type='primary'
-                icon={<IoMdAdd />}
-                size={'large'}
-                onClick={() => {
-                  setIsNewFileModalOpen(true);
-                }}
-              >
-                New File
-              </Button>
-            </Col>
-          </Row>
-        )}
+      {freeToUseSelectedRowKeys?.length == 0 && (
+        <Row style={{ marginBottom: '1rem' }}>
+          <Col>
+            <Button
+              type='primary'
+              icon={<IoMdAdd />}
+              size={'large'}
+              onClick={() => {
+                setIsNewFileModalOpen(true);
+              }}
+            >
+              New File
+            </Button>
+          </Col>
+        </Row>
+      )}
 
       <Row
         gutter={24}
         style={{ height: '100%' }}
       >
         <Col span={12}>
-          {myCheckedInSelectedRowKeys.length == 0 ? (
-            <Table
-              pagination={{ pageSize: 10, position: ['bottomLeft'] }}
-              style={{ width: '100%' }}
-              columns={freeToUseColumns}
-              dataSource={data}
-              size='small'
-              rowSelection={freeToUseRowSelection}
-            />
-          ) : (
-            <LargeMultiSelectButtons
-              onCheckInClick={() => {}}
-              onDeleteClick={() => {}}
-            />
-          )}
+          <Table
+            pagination={{ pageSize: 10, position: ['bottomLeft'] }}
+            style={{ width: '100%' }}
+            columns={freeToUseColumns}
+            dataSource={files
+              ?.filter((file) => file.FilesStatus[0]?.status_id == 2)
+              .map((file) => ({ ...file, key: file.id }))}
+            size='small'
+            rowSelection={freeToUseRowSelection}
+          />
         </Col>
 
         <Col span={12}>
@@ -578,31 +434,53 @@ export default function ViewOneGroup() {
               <Row>
                 <Table
                   pagination={{
-                    pageSize: myCheckedInSelectedRowKeys.length == 0 ? 3 : 9,
+                    pageSize: 3,
                   }}
                   style={{ width: '100%' }}
                   columns={myCheckedInColumns}
-                  dataSource={data2}
+                  dataSource={files
+                    ?.filter(
+                      (file) =>
+                        file.FilesStatus[0]?.status_id == 1 &&
+                        file.FilesStatus[0]?.user?.username ==
+                          getLoggedInUser().username
+                    )
+                    .map((file) => ({ ...file, key: file.id }))}
                   size='small'
-                  rowSelection={myCheckedInRowSelection}
                 />
               </Row>
 
-              {myCheckedInSelectedRowKeys.length == 0 && (
-                <Row style={{ marginTop: '0em' }}>
-                  <Table
-                    pagination={{ pageSize: 3 }}
-                    style={{ width: '100%' }}
-                    columns={othersCheckedInColumns}
-                    dataSource={data}
-                    size='small'
-                  />
-                </Row>
-              )}
+              <Row style={{ marginTop: '0em' }}>
+                <Table
+                  pagination={{ pageSize: 3 }}
+                  style={{ width: '100%' }}
+                  columns={othersCheckedInColumns}
+                  dataSource={files
+                    ?.filter(
+                      (file) =>
+                        file.FilesStatus[0]?.status_id == 1 &&
+                        file.FilesStatus[0]?.user?.username !=
+                          getLoggedInUser().username
+                    )
+                    .map((file) => ({ ...file, key: file.id }))}
+                  size='small'
+                />
+              </Row>
             </>
           ) : (
             <LargeMultiSelectButtons
-              onCheckInClick={() => {}}
+              onCheckInClick={() => {
+                console.log(freeToUseSelectedRowKeys);
+                checkInFiles(freeToUseSelectedRowKeys)
+                  .unwrap()
+                  .then(() => {
+                    setFreeToUseSelectedRowKeys([]);
+
+                    successMessage({
+                      content: 'Files Checked In Successfully',
+                    });
+                  });
+              }}
               onDeleteClick={() => {}}
             />
           )}
@@ -613,6 +491,19 @@ export default function ViewOneGroup() {
         isOpen={isNewFileModalOpen}
         setOpen={setIsNewFileModalOpen}
       />
+      
+      <EditFileModal
+        isOpen={isEditFileModalOpen}
+        setOpen={setIsEditFileModalOpen}
+        file={selectedFile}
+      />
+
+      <Spin
+        spinning={isFilesLoading}
+        fullscreen
+      />
+
+      {contextHolder}
     </>
   );
 }

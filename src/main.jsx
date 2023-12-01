@@ -23,7 +23,7 @@ const router = createBrowserRouter([
         element: <ViewAllGroups />,
       },
       {
-        path: "groups/:group_name",
+        path: "groups/:group_id",
         element: <ViewOneGroup />,
       },
       {

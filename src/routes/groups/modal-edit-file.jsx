@@ -14,11 +14,14 @@ import {
 import Title from 'antd/es/typography/Title';
 import Typography from 'antd/es/typography/Typography';
 import Dragger from 'antd/es/upload/Dragger';
-import { BsPerson } from 'react-icons/bs';
+import { BsDownload, BsPerson } from 'react-icons/bs';
 import { IoIosAdd, IoIosRemove } from 'react-icons/io';
 import { RiInboxArchiveFill } from 'react-icons/ri';
 import { TiUploadOutline } from 'react-icons/ti';
-import { useCreateFileMutation } from '../../app/services/files';
+import {
+  useCreateFileMutation,
+  useUpdateFileMutation,
+} from '../../app/services/files';
 import { useGetUsersQuery } from '../../app/services/users';
 import { successMessage } from '../../components/messages.api';
 import { useForm } from 'antd/es/form/Form';
@@ -26,9 +29,9 @@ import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 const { useToken } = theme;
 
-export default function NewFileModal({ isOpen, setOpen }) {
-  const [createFile, { isLoading: isCreateFileLoading }] =
-    useCreateFileMutation();
+export default function EditFileModal({ isOpen, setOpen, file }) {
+  const [updateFile, { isLoading: isUpdateFileLoading }] =
+    useUpdateFileMutation();
   const { group_id } = useParams();
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -39,14 +42,20 @@ export default function NewFileModal({ isOpen, setOpen }) {
   };
 
   useEffect(() => {
-    if (isCreateFileLoading) {
+    console.log('file', file);
+    form.setFieldValue(['name'], file?.name);
+    //TODO download file
+  }, [file, isOpen]);
+
+  useEffect(() => {
+    if (isUpdateFileLoading) {
       messageApi.open({
         type: 'loading',
-        content: 'creating file..',
+        content: 'updating file..',
         duration: 0,
       });
     } else messageApi.destroy();
-  }, [isCreateFileLoading]);
+  }, [isUpdateFileLoading]);
 
   return (
     <Modal
@@ -64,9 +73,7 @@ export default function NewFileModal({ isOpen, setOpen }) {
           formData.append('folder_id', group_id);
           formData.append('file', fields.file.fileList[0].originFileObj);
 
-          console.log('file', formData);
-
-          createFile(formData)
+          updateFile(formData)
             .unwrap()
             .then(() => {
               closeModal();
@@ -99,7 +106,15 @@ export default function NewFileModal({ isOpen, setOpen }) {
             level={5}
             style={{ margin: '1rem 0' }}
           >
-            File
+            Download
+          </Title>
+          <Button><BsDownload></BsDownload></Button>
+
+          <Title
+            level={5}
+            style={{ margin: '1rem 0' }}
+          >
+            Update
           </Title>
 
           <Form.Item
@@ -112,7 +127,7 @@ export default function NewFileModal({ isOpen, setOpen }) {
           >
             <Dragger maxCount={1}>
               <TiUploadOutline size={'2em'} />
-              <p>Click or drag file to this area to upload</p>
+              <p>Click or drag file to this area to replace current file</p>
             </Dragger>
           </Form.Item>
         </div>
@@ -127,7 +142,7 @@ export default function NewFileModal({ isOpen, setOpen }) {
             type='primary'
             htmlType='submit'
           >
-            Create
+            update
           </Button>
         </Space>
       </Form>

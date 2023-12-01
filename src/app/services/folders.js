@@ -1,4 +1,5 @@
 import { apiSlice } from '../apiSlice';
+import io from 'socket.io-client';
 
 export const folders = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,88 +10,7 @@ export const folders = apiSlice.injectEndpoints({
         body: data,
       }),
       invalidatesTags: ['Folder'],
-      /*   async onCacheEntryAdded(
-        arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
-      ) {
-        const ws = new WebSocket('ws://localhost');
-        try {
-          await cacheDataLoaded;
-
-          const folderCreationListener = (event) => {
-            const message = JSON.parse(event.data);
-            switch (message.type) {
-              case 'notifications': {
-                updateCachedData((draft) => {
-                  draft.push(...message.payload);
-                });
-                break;
-              }
-              default:
-                break;
-            }
-          };
-
-          const folderUpdateListener = (event) => {
-            const message = JSON.parse(event.data);
-            switch (message.type) {
-              case 'update': {
-                const updatedFolder = message.payload;
-
-                updateCachedData((draft) => {
-                  const existingIndex = draft.findIndex(
-                    (folder) => folder.id === updatedFolder.id
-                  );
-
-                  if (existingIndex !== -1) {
-                    draft[existingIndex] = updatedFolder;
-                  }
-                  draft.push(...message.payload);
-                });
-                break;
-              }
-              default:
-                break;
-            }
-          };
-
-          const folderDeleteListener = (event) => {
-            const message = JSON.parse(event.data);
-            switch (message.type) {
-              case 'delete': {
-                // Assuming that the payload contains the ID of the folder to be deleted
-                const deletedFolderId = message.payload;
-
-                // Update cached data or perform any other necessary actions
-                updateCachedData((draft) => {
-                  // Find the index of the folder to be deleted
-                  const deletedIndex = draft.findIndex(
-                    (folder) => folder.id === deletedFolderId
-                  );
-
-                  if (deletedIndex !== -1) {
-                    // Remove the folder from the cache
-                    draft.splice(deletedIndex, 1);
-                  }
-                  // If the folder doesn't exist in the cache, you might choose to handle it differently
-                });
-                break;
-              }
-              default:
-                break;
-            }
-          };
-
-          ws.addEventListener('folderCreated', folderCreationListener);
-          ws.addEventListener('folderUpdated', folderUpdateListener);
-          ws.addEventListener('folderDeleted', folderDeleteListener);
-        } catch {
-          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
-          // in which case `cacheDataLoaded` will throw
-        }
-        await cacheEntryRemoved;
-        ws.close();
-      }, */
+   
     }),
 
     getFolders: builder.query({
@@ -99,13 +19,73 @@ export const folders = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       providesTags: ['Folder'],
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        const socket = io('localhost:8000/folders');
+        console.log('socket', socket);
+
+        try {
+          await cacheDataLoaded;
+
+          const folderCreationListener = (message) => {
+            console.log('socket', message);
+            updateCachedData((draft) => {
+              draft.push(message);
+            });
+          };
+
+          const folderUpdateListener = (message) => {
+            console.log('socket', message);
+
+            const updatedFolder = message;
+
+            updateCachedData((draft) => {
+              const existingIndex = draft.findIndex(
+                (folder) => folder.id === updatedFolder.id
+              );
+
+              if (existingIndex !== -1) {
+                draft[existingIndex] = updatedFolder;
+              }
+              draft.push(message);
+            });
+          };
+
+          const folderDeleteListener = (message) => {
+            console.log('socket', message);
+
+            const deletedFolderId = message;
+
+            updateCachedData((draft) => {
+              const deletedIndex = draft.findIndex(
+                (folder) => folder.id === deletedFolderId
+              );
+
+              if (deletedIndex !== -1) {
+                draft.splice(deletedIndex, 1);
+              }
+            });
+          };
+
+          socket.on('folderCreated', folderCreationListener);
+          socket.on('folderUpdated', folderUpdateListener);
+          socket.on('folderDeleted', folderDeleteListener);
+        } catch {
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+        }
+        await cacheEntryRemoved;
+        socket.close();
+      },
     }),
 
     updateFolder: builder.mutation({
       query: (data) => ({
         url: `folders/${data.id}`,
         method: 'PATCH',
-        body: data,
+        body: { ...data, id: undefined },
       }),
       invalidatesTags: ['Folder'],
     }),
@@ -122,6 +102,8 @@ export const folders = apiSlice.injectEndpoints({
 
 export const {
   useLazyGetFoldersQuery,
+  useGetFoldersQuery,
   useCreateFolderMutation,
-  useGetFoldersQuery
+  useDeleteFolderMutation,
+  useUpdateFolderMutation,
 } = folders;

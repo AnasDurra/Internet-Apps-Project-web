@@ -1,22 +1,38 @@
-import { Button, Col, Row, Space, Table, Tag, Typography } from 'antd';
+import {
+  Button,
+  Col,
+  Popconfirm,
+  Row,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
 import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { IoMdAdd } from 'react-icons/io';
 import { useState } from 'react';
 import Title from 'antd/es/typography/Title';
-import EditAccessModal from './modal-edit-group';
+import EditGroupModal from './modal-edit-group';
 import NewGroupModal from './modal-new-group';
 import { useNavigate } from 'react-router-dom';
 import '/src/routes/groups/zstyle.css';
-import { useGetFoldersQuery } from '../../app/services/folders';
+import {
+  useDeleteFolderMutation,
+  useGetFoldersQuery,
+} from '../../app/services/folders';
 import { LuFolderCog } from 'react-icons/lu';
+import moment from 'moment';
 
 export default function ViewAllGroups() {
-  const { data: folders, isLoading, isError } = useGetFoldersQuery();
+  const { data: folders, isLoading:isFoldersLoading, isError } = useGetFoldersQuery();
+  const [deleteFolder] = useDeleteFolderMutation();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isEditAccessModalOpen, setIsEditAccessModalOpen] = useState(false);
+  const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState();
   const navigate = useNavigate();
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -45,7 +61,7 @@ export default function ViewAllGroups() {
               <RiFoldersFill
                 color='#fadb14'
                 size={'3em'}
-              ></RiFoldersFill>
+              />
             </Col>
             <Col>
               <Row>
@@ -61,7 +77,7 @@ export default function ViewAllGroups() {
     },
     {
       title: 'Owner',
-      dataIndex: 'owner',
+      dataIndex: 'owner_id', //TODO make it name
       key: 'owner',
       width: '20%',
       render: (text) => text,
@@ -69,11 +85,10 @@ export default function ViewAllGroups() {
 
     {
       title: 'Last Updated',
-      dataIndex: 'lastUpdated',
+      dataIndex: 'updated_at',
       key: 'lastUpdated',
       width: '20%',
-
-      render: (text) => text,
+      render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
     },
     {
       key: 'action',
@@ -85,7 +100,8 @@ export default function ViewAllGroups() {
               <a
                 onClick={(event) => {
                   event.stopPropagation();
-                  setIsEditAccessModalOpen(true);
+                  setSelectedFolder(record);
+                  setIsEditGroupModalOpen(true);
                 }}
               >
                 <LuFolderCog
@@ -95,43 +111,27 @@ export default function ViewAllGroups() {
               </a>
             </Col>
             <Col>
-              <a
-                onClick={(event) => {
+              <Popconfirm
+                title='Delete the folder'
+                description='Are you sure to delete this folder?'
+                onConfirm={(event) => {
+                  deleteFolder(record.id);
                   event.stopPropagation();
                 }}
+                okText='Yes'
+                cancelText='No'
               >
-                <MdOutlineDeleteOutline
-                  size={'1.5em'}
-                  color='#ff7875'
-                />
-              </a>
+                <a onClick={(event) => event.stopPropagation()}>
+                  <MdOutlineDeleteOutline
+                    size={'1.5em'}
+                    color='#ff7875'
+                  />
+                </a>
+              </Popconfirm>
             </Col>
           </Row>
         ) : null;
       },
-    },
-  ];
-  const data = [
-    {
-      key: '1',
-      name: 'Public',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      lastUpdated: '12 April 2023',
-      owner: 'Admin',
-      tags: ['cool', 'teacher'],
     },
   ];
 
@@ -157,26 +157,32 @@ export default function ViewAllGroups() {
           rowClassName={() => 'row'}
           style={{ width: '100%' }}
           columns={columns}
-          dataSource={data}
+          dataSource={folders}
           rowSelection={rowSelection}
           onRow={(record, rowIndex) => {
             return {
               onClick: (event) => {
-                navigate(`${record.name}`);
+                navigate(`${record.id}`);
               },
             };
           }}
         />
       </Row>
 
-      <EditAccessModal
-        isOpen={isEditAccessModalOpen}
-        setOpen={setIsEditAccessModalOpen}
+      <EditGroupModal
+        isOpen={isEditGroupModalOpen}
+        setOpen={setIsEditGroupModalOpen}
+        folder={selectedFolder}
       />
 
       <NewGroupModal
         isOpen={isNewGroupModalOpen}
         setOpen={setIsNewGroupModalOpen}
+      />
+
+      <Spin
+        spinning={isFoldersLoading}
+        fullscreen
       />
     </div>
   );

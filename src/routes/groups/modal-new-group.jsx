@@ -14,11 +14,15 @@ import {
 import { useForm } from 'antd/es/form/Form';
 import Title from 'antd/es/typography/Title';
 import { useGetUsersQuery } from '../../app/services/users';
-import { useLazyGetFoldersQuery } from '../../app/services/folders';
+import {
+  useCreateFolderMutation,
+  useLazyGetFoldersQuery,
+} from '../../app/services/folders';
 import { useEffect, useState } from 'react';
+import { successMessage } from '../../components/messages.api';
 
 export default function NewGroupModal({ isOpen, setOpen }) {
-  const [createFolder] = useLazyGetFoldersQuery();
+  const [createFolder] = useCreateFolderMutation();
   const { data: users, isLoading } = useGetUsersQuery();
 
   const [form] = useForm();
@@ -27,6 +31,7 @@ export default function NewGroupModal({ isOpen, setOpen }) {
 
   const closeModal = () => {
     form.resetFields();
+    setSelectedUserId(null);
     setOpen(false);
   };
 
@@ -44,7 +49,7 @@ export default function NewGroupModal({ isOpen, setOpen }) {
 
   useEffect(() => {
     updateFilteredOptions();
-  }, [users]);
+  }, [isOpen, users]);
 
   return (
     <Modal
@@ -57,14 +62,18 @@ export default function NewGroupModal({ isOpen, setOpen }) {
       <Form
         form={form}
         onFinish={(fields) => {
-          console.log('fields', fields);
+          console.log('fields', {
+            name: fields.name,
+            access_list: fields.currentUsers?.map((user) => user.id),
+          });
           createFolder({
             name: fields.name,
-            access_list: fields.currentUsers.map((user) => user.id),
+            access_list: fields.currentUsers?.map((user) => user.id),
           })
             .unwrap()
             .then(() => {
               closeModal();
+              successMessage({ content: `folder ${fields.name} created` });
             });
           //TODO middleware for server side error
         }}
@@ -166,6 +175,7 @@ export default function NewGroupModal({ isOpen, setOpen }) {
                   dataSource={currentUsers}
                   renderItem={(item, index) => (
                     <List.Item
+                      key={'list-user-item-' + index}
                       extra={
                         <Button
                           type='text'

@@ -18,14 +18,16 @@ import Title from 'antd/es/typography/Title';
 import Typography from 'antd/es/typography/Typography';
 import { BsPerson } from 'react-icons/bs';
 import { IoIosAdd, IoIosRemove } from 'react-icons/io';
-import { useLazyGetFoldersQuery } from '../../app/services/folders';
+import {
+  useLazyGetFoldersQuery,
+  useUpdateFolderMutation,
+} from '../../app/services/folders';
 import { useGetUsersQuery } from '../../app/services/users';
 import { useEffect, useState } from 'react';
-
-const { useToken } = theme;
+import { successMessage } from '../../components/messages.api';
 
 export default function EditGroupModal({ isOpen, setOpen, folder }) {
-  const [createFolder] = useLazyGetFoldersQuery();
+  const [updateFolder] = useUpdateFolderMutation();
   const { data: users, isLoading } = useGetUsersQuery();
 
   const [form] = useForm();
@@ -33,7 +35,7 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
   const [filteredOptions, setFilteredOptions] = useState();
 
   const closeModal = () => {
-    form.resetFields();
+    setSelectedUserId(null);
     setOpen(false);
   };
 
@@ -53,6 +55,17 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
     updateFilteredOptions();
   }, [users]);
 
+  useEffect(() => {
+    form.setFieldValue(
+      ['currentUsers'],
+      users?.filter((user) =>
+        folder?.accessList?.map((access) => access.user_id).includes(user.id)
+      )
+    );
+    form.setFieldValue(['name'], folder?.name);
+    updateFilteredOptions();
+  }, [folder,isOpen]);
+
   return (
     <Modal
       open={isOpen}
@@ -64,14 +77,19 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
       <Form
         form={form}
         onFinish={(fields) => {
-          console.log('fields', fields);
-          createFolder({
+          console.log('fields', {
             name: fields.name,
-            access_list: fields.currentUsers.map((user) => user.id),
+            access_list: fields.currentUsers?.map((user) => user.id),
+          });
+          updateFolder({
+            id: folder.id,
+            name: fields.name,
+            access_list: fields.currentUsers?.map((user) => user.id),
           })
             .unwrap()
             .then(() => {
               closeModal();
+              successMessage({ content: `folder ${fields.name} updated` });
             });
           //TODO middleware for server side error
         }}
@@ -225,7 +243,7 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
             type='primary'
             htmlType='submit'
           >
-            Create
+            Update
           </Button>
         </Space>
       </Form>

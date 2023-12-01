@@ -89,7 +89,6 @@ const UserRegister = () => {
         }, 2000);
       }
     } catch (error) {
-      console.log(1);
       wrong();
     }
   };

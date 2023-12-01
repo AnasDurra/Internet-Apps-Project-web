@@ -8,10 +8,10 @@ import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 const dummyData = {
-  username: 'zal',
+  username: 'anas',
   password: '12341234',
   full_name: 'Alaa Zamel',
-  email: 'az10@gmail.com',
+  email: 'doma@gmail.com',
 };
 
 export default function DummyPage() {
@@ -21,12 +21,16 @@ export default function DummyPage() {
 
   useEffect(() => {
     if (results.data?.accessToken)
-      Cookies.set('accessToken', results.data?.accessToken);
+      Cookies.set('accessToken', data?.accessToken, {
+        expires: 12,
+      }); //TODO encrypt before saving
   }, [results.data]);
 
   useEffect(() => {
-    console.log('data tok', data?.accessToken);
-    if (data?.accessToken) Cookies.set('accessToken', data?.accessToken);
+    if (data?.accessToken)
+      Cookies.set('accessToken', data?.accessToken, {
+        expires: 12,
+      });
   }, [data?.accessToken]);
 
   return (
