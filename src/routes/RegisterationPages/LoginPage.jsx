@@ -62,8 +62,8 @@ const LoginPage = () => {
         }
       } else {
         success();
-        const token = Cookies.set("accessToken", result.data.accessToken);
-        console.log(token);
+        // const token = Cookies.set("accessToken", result.data.accessToken);
+        // console.log(token);
         setFormDisabled(true);
         setTimeout(() => {
           navigate("/");
