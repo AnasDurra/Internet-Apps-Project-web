@@ -19,6 +19,9 @@ const authMiddleware = (store) => (next) => async (action) => {
     }
   }
 
+  if (response.payload?.status == 401 || response.payload?.state == 403)
+    router.navigate('/login', { replace: true });
+  
   return response;
 };
 
