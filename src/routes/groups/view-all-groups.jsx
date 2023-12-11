@@ -155,7 +155,7 @@ export default function ViewAllGroups() {
           style={{ width: "100%" }}
           columns={columns}
           dataSource={folders}
-          rowSelection={rowSelection}
+         // rowSelection={rowSelection}
           onRow={(record, rowIndex) => {
             return {
               onClick: (event) => {
