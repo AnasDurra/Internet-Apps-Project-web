@@ -60,16 +60,16 @@ export default function ViewAllGroups() {
             <Col>
               <RiFoldersFill
                 color='#fadb14'
-                size={'3em'}
+                size={'2em'}
               />
             </Col>
             <Col>
               <Row>
                 <Typography.Text>{text}</Typography.Text>
               </Row>
-              <Row>
+             {/*  <Row>
                 <Typography.Text type="secondary">(12 Files)</Typography.Text>
-              </Row>
+              </Row> */}
             </Col>
           </Row>
         </div>

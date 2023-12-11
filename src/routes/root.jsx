@@ -1,17 +1,21 @@
-import { Layout } from "antd";
-import { Content, Footer } from "antd/es/layout/layout";
-import { Outlet } from "react-router-dom";
-import AppHeader from "./AppHeader/AppHeader";
+import { Layout } from 'antd';
+import { Content, Footer } from 'antd/es/layout/layout';
+import { Outlet, useLocation } from 'react-router-dom';
+import AppHeader from './AppHeader/AppHeader';
 
 export default function Root() {
+  const location = useLocation();
+  const excludedPaths = ['/login', '/signup'];
+  const shouldRenderHeader = !excludedPaths.includes(location.pathname);
+
   return (
     <Layout>
-      <AppHeader />
+      {shouldRenderHeader && <AppHeader />}
       <Content
         style={{
-          padding: "1% 5%", // keep it 1% please
-          backgroundColor: "#fdfdfd",
-          minHeight: "82vh",
+          padding: '1% 5%', // keep it 1% please
+          backgroundColor: '#fdfdfd',
+          minHeight: '82vh',
         }}
       >
         <Outlet />
@@ -19,7 +23,7 @@ export default function Root() {
 
       <Footer
         style={{
-          textAlign: "center",
+          textAlign: 'center',
         }}
       >
         Internet Apps Project (23-24)
