@@ -12,8 +12,7 @@ const ViewFileHistoryModal = ({
   file_id,
 }) => {
   const [messageApi, contextHolder] = message.useMessage();
-  const [data, setData] = useState([]);
-  const [getFileHistory, { isLoading, isFetching }] =
+  const [getFileHistory, { isLoading, isFetching, data }] =
     useLazyGetFileHistoryQuery();
 
   const wrong = (message = 'Something went wrong!') => {
@@ -23,17 +22,8 @@ const ViewFileHistoryModal = ({
     });
   };
   useEffect(() => {
-    setData([]);
     if (file_id) {
-      getFileHistory({ file_id: file_id })
-        .unwrap()
-        .then((result) => {
-          // console.log(result);
-          setData(result);
-        })
-        .catch((error) => {
-          wrong(error.status === 400 ? 'File does not exists !' : null);
-        });
+      getFileHistory({ file_id: file_id });
     }
   }, [file_id]);
 
