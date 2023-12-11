@@ -13,7 +13,10 @@ const authMiddleware = (store) => (next) => async (action) => {
     Cookies.remove('refreshToken');
     store.dispatch(auth.endpoints.refresh.initiate(refreshToken));
     response = await next(action);
-    if (response.payload?.status == 401 || response.payload?.state == 403) {
+    if (
+      (response.payload?.status == 401 || response.payload?.state == 403) &&
+      !window.location.pathname.startsWith('/login')
+    ) {
       errorMessage({ content: 'Session Timeout.. login again' });
       router.navigate('/login', { replace: true });
     }
