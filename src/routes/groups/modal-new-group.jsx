@@ -74,8 +74,8 @@ export default function NewGroupModal({ isOpen, setOpen }) {
             .then(() => {
               closeModal();
               successMessage({ content: `folder ${fields.name} created` });
-            });
-          //TODO middleware for server side error
+            })
+            .catch(() => {});
         }}
       >
         <div style={{ margin: '2em' }}>

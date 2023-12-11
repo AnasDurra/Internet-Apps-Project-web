@@ -31,14 +31,15 @@ import EditFileModal from './modal-edit-file';
 import ViewFileHistoryModal from './modal-view-file-history';
 
 export default function ViewOneGroup() {
-  const { group_id } = useParams();
-
   const [freeToUseSelectedRowKeys, setFreeToUseSelectedRowKeys] = useState([]);
   const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
   const [isEditFileModalOpen, setIsEditFileModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedFileHistoryId, setSelectedFileHistoryId] = useState(null);
+
+  const { group_id } = useParams();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const { data: files, isLoading: isFilesLoading } =
     useGetFilesInFolderQuery(group_id);
@@ -47,8 +48,6 @@ export default function ViewOneGroup() {
   const [checkOutFile, { isLoading: isCheckOutFileLoading }] =
     useCheckOutFileMutation();
   const [deleteFile] = useDeleteFileMutation();
-
-  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (isCheckInFileLoading) {
@@ -196,7 +195,8 @@ export default function ViewOneGroup() {
                           successMessage({
                             content: 'File Checked In Successfully',
                           });
-                        });
+                        })
+                        .catch(() => {});
                     }}
                     style={{ color: 'black' }}
                   >
@@ -226,7 +226,6 @@ export default function ViewOneGroup() {
                   <a
                     onClick={() => {
                       setSelectedFileHistoryId(record.key);
-
                       setIsHistoryModalOpen(true);
                     }}
                   >
@@ -341,7 +340,8 @@ export default function ViewOneGroup() {
                           successMessage({
                             content: 'File Checked out Successfully',
                           });
-                        });
+                        })
+                        .catch(() => {});
                     }}
                     style={{ color: 'black' }}
                   >

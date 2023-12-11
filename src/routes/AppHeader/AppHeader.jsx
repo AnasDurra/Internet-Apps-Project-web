@@ -1,41 +1,40 @@
-import { Menu } from "antd";
+import { Menu } from 'antd';
 import {
   SettingFilled,
   UserAddOutlined,
   UserOutlined,
   HistoryOutlined,
-} from "@ant-design/icons";
-import { Header } from "antd/es/layout/layout";
-import { useState } from "react";
+} from '@ant-design/icons';
+import { Header } from 'antd/es/layout/layout';
+import { useState } from 'react';
 
-import { useNavigate } from "react-router-dom";
-import { AiOutlineHistory } from "react-icons/ai";
+import { useNavigate } from 'react-router-dom';
+import { AiOutlineHistory } from 'react-icons/ai';
 
 const AppHeader = () => {
   const navigate = useNavigate();
   const HeaderItems = [
-    { url: "configurations", title: "Configurations", icon: <SettingFilled /> },
     {
-      url: "user-files-history",
-      title: "User Files History",
+      url: 'user-files-history',
+      title: 'User Files History',
       icon: <HistoryOutlined />,
     },
   ];
-  const [selectedItem, setSelectedItem] = useState("Login");
+  const [selectedItem, setSelectedItem] = useState('Login');
   return (
     <div>
       <Header
         style={{
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#5c0011",
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: '#5c0011',
         }}
       >
         <Menu
-          mode="horizontal"
+          mode='horizontal'
           style={{
-            width: "100%",
-            backgroundColor: "#5c0011",
+            width: '100%',
+            backgroundColor: '#5c0011',
           }}
           selectedKeys={[selectedItem]}
           onSelect={(info) => {
@@ -47,11 +46,11 @@ const AppHeader = () => {
               icon: item.icon ?? false,
               key: item.url,
               label: item.title,
-              className: "menu-item",
+              className: 'menu-item',
               style: {
                 backgroundColor:
-                  selectedItem === item.url ? "rgb(151, 0, 0)" : "transparent",
-                transition: "background-color 0.3s",
+                  selectedItem === item.url ? 'rgb(151, 0, 0)' : 'transparent',
+                transition: 'background-color 0.3s',
               },
             };
           })}

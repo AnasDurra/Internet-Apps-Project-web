@@ -8,13 +8,12 @@ export const apiSlice = createApi({
     baseUrl: 'http://localhost:8000/',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
-      console.log('token', token);
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  tagTypes: ['Folder','History'],
+  tagTypes: ['Folder','History','Files','FileCheck'],
   endpoints: () => ({}),
 });

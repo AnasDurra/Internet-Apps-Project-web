@@ -10,7 +10,7 @@ export const files = apiSlice.injectEndpoints({
         body: data,
         formData: true,
       }),
-      invalidatesTags: ['files'],
+      invalidatesTags: ['Files'],
     }),
 
     getFilesInFolder: builder.query({
@@ -18,7 +18,7 @@ export const files = apiSlice.injectEndpoints({
         url: `files/all/?folder_id=${folder_id}`,
         method: 'GET',
       }),
-      providesTags: ['files'],
+      providesTags: ['Files'],
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -80,7 +80,8 @@ export const files = apiSlice.injectEndpoints({
               );
 
               if (checkedInIndex !== -1) {
-                draft[checkedInIndex].FilesStatus.status_id = 1; //TODO
+                draft[checkedInIndex].FilesStatus.status_id = 1;
+                draft[checkedInIndex].FilesStatus.user = message.user;
               }
             });
           };
@@ -96,7 +97,8 @@ export const files = apiSlice.injectEndpoints({
               );
 
               if (checkedOutIndex !== -1) {
-                draft[checkedOutIndex].FilesStatus.status_id = 2; //TODO also user object
+                draft[checkedOutIndex].FilesStatus.status_id = 2;
+                draft[checkedOutIndex].FilesStatus.user = null;
               }
             });
           };
@@ -116,12 +118,15 @@ export const files = apiSlice.injectEndpoints({
     }),
 
     updateFile: builder.mutation({
-      query: (file) => ({
-        url: `files/${file.id}`,
-        method: 'PATCH',
-        body: { ...file, id: undefined },
-      }),
-      invalidatesTags: ['files'],
+      query: ([formData, file_id]) => {
+        return {
+          url: `files/${file_id}`,
+          method: 'PATCH',
+          body: formData,
+          formData: true,
+        };
+      },
+      invalidatesTags: ['Files'],
     }),
 
     deleteFile: builder.mutation({
@@ -129,7 +134,7 @@ export const files = apiSlice.injectEndpoints({
         url: `files/${file_id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['files'],
+      invalidatesTags: ['Files'],
     }),
 
     checkInFiles: builder.mutation({
@@ -141,7 +146,7 @@ export const files = apiSlice.injectEndpoints({
           body: { file_id: ids },
         };
       },
-      invalidatesTags: ['files'],
+      invalidatesTags: ['Files', 'FileCheck'],
     }),
 
     checkOutFile: builder.mutation({
@@ -153,7 +158,7 @@ export const files = apiSlice.injectEndpoints({
           body: { file_id: id },
         };
       },
-      invalidatesTags: ['files'],
+      invalidatesTags: ['Files', 'FileCheck'],
     }),
   }),
 });

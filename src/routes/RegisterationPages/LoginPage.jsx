@@ -37,10 +37,10 @@ const LoginPage = () => {
     });
   };
   const warning = () => {
-    messageApi.open({
+    /* messageApi.open({
       type: "warning",
       content: "The user name or password is incorrect",
-    });
+    }); */
   };
 
   const wrong = () => {

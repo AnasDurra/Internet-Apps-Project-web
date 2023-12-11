@@ -64,7 +64,7 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
     );
     form.setFieldValue(['name'], folder?.name);
     updateFilteredOptions();
-  }, [folder,isOpen]);
+  }, [folder, isOpen]);
 
   return (
     <Modal
@@ -90,8 +90,8 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
             .then(() => {
               closeModal();
               successMessage({ content: `folder ${fields.name} updated` });
-            });
-          //TODO middleware for server side error
+            })
+            .catch(() => {});
         }}
       >
         <div style={{ margin: '2em' }}>

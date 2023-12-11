@@ -77,7 +77,7 @@ export default function ViewAllGroups() {
     },
     {
       title: 'Owner',
-      dataIndex: 'owner_id', //TODO make it name
+      dataIndex: ['owner','username'], 
       key: 'owner',
       width: '20%',
       render: (text) => text,

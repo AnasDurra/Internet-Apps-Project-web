@@ -4,13 +4,37 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineHistory, AiTwotoneLock } from "react-icons/ai";
 import { BsFillUnlockFill } from "react-icons/bs";
 
-import { useGetFileHistoryMutation } from "../../app/services/history";
+import { useLazyGetFileHistoryQuery } from "../../app/services/history";
 
 const ViewFileHistoryModal = ({
   isHistoryModalOpen,
   setIsHistoryModalOpen,
   file_id,
 }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [data, setData] = useState([]);
+  const [getFileHistory, { isLoading, isFetching }] =
+    useLazyGetFileHistoryQuery();
+
+  const wrong = (message = "Something went wrong!") => {
+    messageApi.open({
+      type: "error",
+      content: message,
+    });
+  };
+  useEffect(() => {
+    setData([]);
+    getFileHistory({ file_id: file_id })
+      .unwrap()
+      .then((result) => {
+        // console.log(result);
+        setData(result);
+      })
+      .catch((error) => {
+        wrong(error.status === 400 ? "File does not exists !" : null);
+      });
+  }, [file_id]);
+
   const columns = [
     {
       key: "1",
@@ -76,30 +100,6 @@ const ViewFileHistoryModal = ({
       },
     },
   ];
-
-  const [messageApi, contextHolder] = message.useMessage();
-  const [data, setData] = useState([]);
-  const [getFileHistory, { isLoading, isFetching }] =
-    useGetFileHistoryMutation();
-
-  const wrong = (message = "Something went wrong!") => {
-    messageApi.open({
-      type: "error",
-      content: message,
-    });
-  };
-  useEffect(() => {
-    setData([]);
-    getFileHistory({ file_id: file_id })
-      .unwrap()
-      .then((result) => {
-        // console.log(result);
-        setData(result);
-      })
-      .catch((error) => {
-        wrong(error.status === 400 ? "File does not exists !" : null);
-      });
-  }, [file_id]);
 
   return (
     <Modal

@@ -84,7 +84,7 @@ const UserRegister = () => {
         success();
         setFormDisabled(true);
         setTimeout(() => {
-          navigate('/login');
+          navigate('/');
           setFormDisabled(false);
         }, 2000);
       }

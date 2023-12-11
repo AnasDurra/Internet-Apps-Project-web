@@ -23,11 +23,16 @@ import {
   useUpdateFileMutation,
 } from '../../app/services/files';
 import { useGetUsersQuery } from '../../app/services/users';
-import { successMessage } from '../../components/messages.api';
+import {
+  errorMessage,
+  loadingMessage,
+  successMessage,
+} from '../../components/messages.api';
 import { useForm } from 'antd/es/form/Form';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 const { useToken } = theme;
+
 
 export default function EditFileModal({ isOpen, setOpen, file }) {
   const [updateFile, { isLoading: isUpdateFileLoading }] =
@@ -35,16 +40,17 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
   const { group_id } = useParams();
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [isFormTouched, setIsFormTouched] = useState(false);
 
   const closeModal = () => {
     form.resetFields();
+    setIsFormTouched(false);
     setOpen(false);
   };
 
   useEffect(() => {
     console.log('file', file);
     form.setFieldValue(['name'], file?.name);
-    //TODO download file
   }, [file, isOpen]);
 
   useEffect(() => {
@@ -67,18 +73,23 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
     >
       <Form
         form={form}
+        onValuesChange={() => {
+          setIsFormTouched(true);
+        }}
         onFinish={(fields) => {
           const formData = new FormData();
           formData.append('name', fields.name);
           formData.append('folder_id', group_id);
-          formData.append('file', fields.file.fileList[0].originFileObj);
+          if (fields.file)
+            formData.append('file', fields.file.fileList[0]?.originFileObj);
 
-          updateFile(formData)
+          updateFile([formData, file?.id])
             .unwrap()
             .then(() => {
               closeModal();
-              successMessage({ content: `file ${fields.name} created` });
-            });
+              successMessage({ content: `file ${fields.name} updated` });
+            })
+            .catch(() => {});
         }}
       >
         <div style={{ margin: '2em' }}>
@@ -108,7 +119,13 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
           >
             Download
           </Title>
-          <Button><BsDownload></BsDownload></Button>
+          <Button
+            onClick={() => {
+              downloadFile(file);
+            }}
+          >
+            <BsDownload />
+          </Button>
 
           <Title
             level={5}
@@ -117,14 +134,7 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
             Update
           </Title>
 
-          <Form.Item
-            name='file'
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item name='file'>
             <Dragger maxCount={1}>
               <TiUploadOutline size={'2em'} />
               <p>Click or drag file to this area to replace current file</p>
@@ -141,6 +151,7 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
           <Button
             type='primary'
             htmlType='submit'
+            disabled={!isFormTouched}
           >
             update
           </Button>
@@ -150,3 +161,37 @@ export default function EditFileModal({ isOpen, setOpen, file }) {
     </Modal>
   );
 }
+
+const downloadFile = async (file) => {
+  //TODO const URL
+  const fileUrl = `http://localhost:8000/${file?.path}`;
+
+  try {
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      errorMessage({
+        content: `Failed to download file: ${response.status} ${response.statusText}`,
+      });
+      return;
+    }
+
+    const filename = file?.name;
+    const extension = file?.path.split('.').pop();
+    const fullFilename = `${filename}.${extension}`;
+
+    const blob = await response.blob();
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fullFilename;
+    document.body.appendChild(link);
+
+    link.click();
+
+    loadingMessage({ content: 'Downloading...' });
+    document.body.removeChild(link);
+  } catch (error) {
+    errorMessage({ content: error.message });
+  }
+};
