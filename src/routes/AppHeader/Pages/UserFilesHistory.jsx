@@ -25,8 +25,10 @@ import { UserOutlined } from "@ant-design/icons";
 const UserFilesHistory = () => {
   const { data: users = [], isLoading: isLoadingUsers } = useGetUsersQuery();
   const [data, setData] = useState([]);
-  const [getUserFilesHistory, { isLoadingUserHistory, isFetchingUserHistory }] =
-    useLazyGetUserFilesHistoryQuery();
+  const [
+    getUserFilesHistory,
+    { isLoading: isLoadingUserHistory, isFetching: isFetchingUserHistory },
+  ] = useLazyGetUserFilesHistoryQuery();
 
   const columns = [
     {
