@@ -15,12 +15,14 @@ import {
     Table,
     Typography,
 } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsFillUnlockFill } from "react-icons/bs";
 
 import { useLazyGetUserFilesHistoryQuery } from "../../../app/services/history";
 import { useGetUsersQuery } from "../../../app/services/users";
 import { UserOutlined } from "@ant-design/icons";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 const UserFilesHistory = () => {
     const { data: users = [], isLoading: isLoadingUsers } = useGetUsersQuery();
@@ -29,6 +31,18 @@ const UserFilesHistory = () => {
         getUserFilesHistory,
         { isLoading: isLoadingUserHistory, isFetching: isFetchingUserHistory },
     ] = useLazyGetUserFilesHistoryQuery();
+    const [decodedToken, setDecodedToken] = useState(null);
+
+    useEffect(() => {
+        const jwtToken = Cookies.get("accessToken");
+
+        try {
+            const decoded = jwtDecode(jwtToken);
+            setDecodedToken(decoded);
+        } catch (error) {
+            console.error("Error decoding JWT token:", error.message);
+        }
+    }, []);
 
     const columns = [
         {
@@ -209,13 +223,19 @@ const UserFilesHistory = () => {
                                 isLoadingUserHistory || isFetchingUserHistory
                             }
                             onChange={handleOnSelect}
-                            options={users.map((user) => {
-                                return {
-                                    id: user.id,
-                                    value: user.id,
-                                    label: "@" + user.username,
-                                };
-                            })}
+                            options={users
+                                .filter(
+                                    (user) =>
+                                        user.id == decodedToken?.sub ||
+                                        decodedToken?.sub == 1
+                                )
+                                .map((user) => {
+                                    return {
+                                        id: user.id,
+                                        value: user.id,
+                                        label: "@" + user.username,
+                                    };
+                                })}
                         />
                     </Row>
                 </Space>

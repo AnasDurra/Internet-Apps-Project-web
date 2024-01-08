@@ -6,13 +6,12 @@ import {
   Space,
   Spin,
   Table,
-  Tag,
   Typography,
 } from 'antd';
-import { RiDownloadCloud2Fill, RiFoldersFill } from 'react-icons/ri';
+import { RiFoldersFill } from 'react-icons/ri';
 import { MdManageAccounts, MdOutlineDeleteOutline } from 'react-icons/md';
 import { IoMdAdd } from 'react-icons/io';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Title from 'antd/es/typography/Title';
 import EditGroupModal from './modal-edit-group';
 import NewGroupModal from './modal-new-group';
@@ -24,36 +23,46 @@ import {
 } from '../../app/services/folders';
 import { LuFolderCog } from 'react-icons/lu';
 import moment from 'moment';
+import Cookies from 'js-cookie';
+
 
 export default function ViewAllGroups() {
-  const { data: folders, isLoading:isFoldersLoading, isError } = useGetFoldersQuery();
+  const {
+    data: folders,
+    isLoading: isFoldersLoading,
+    isError,
+  } = useGetFoldersQuery();
   const [deleteFolder] = useDeleteFolderMutation();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState();
+
   const navigate = useNavigate();
+
+
+  
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
     selectedRowKeys,
-    columnWidth: "5%",
+    columnWidth: '5%',
     onChange: onSelectChange,
     getCheckboxProps: (record) => {
       return {
-        disabled: record.name == "Public",
+        disabled: record.name == 'Public',
       };
     },
   };
 
   const columns = [
     {
-      dataIndex: "name",
-      key: "name",
-      width: "40%",
+      dataIndex: 'name',
+      key: 'name',
+      width: '40%',
       render: (text) => (
         <div>
           <Row gutter={16}>
@@ -67,7 +76,7 @@ export default function ViewAllGroups() {
               <Row>
                 <Typography.Text>{text}</Typography.Text>
               </Row>
-             {/*  <Row>
+              {/*  <Row>
                 <Typography.Text type="secondary">(12 Files)</Typography.Text>
               </Row> */}
             </Col>
@@ -77,7 +86,7 @@ export default function ViewAllGroups() {
     },
     {
       title: 'Owner',
-      dataIndex: ['owner','username'], 
+      dataIndex: ['owner', 'username'],
       key: 'owner',
       width: '20%',
       render: (text) => text,
@@ -91,10 +100,10 @@ export default function ViewAllGroups() {
       render: (text) => moment(text).format('YY/MM/DD (HH:mm)'),
     },
     {
-      key: "action",
-      width: "20%",
+      key: 'action',
+      width: '20%',
       render: (_, record) => {
-        return !selectedRowKeys?.length && record.text != "Public" ? (
+        return !selectedRowKeys?.length && record.text != 'Public' ? (
           <Row gutter={16}>
             <Col offset={8}>
               <a
@@ -104,7 +113,10 @@ export default function ViewAllGroups() {
                   setIsEditGroupModalOpen(true);
                 }}
               >
-                <LuFolderCog size={"1.5em"} color="grey" />
+                <LuFolderCog
+                  size={'1.5em'}
+                  color='grey'
+                />
               </a>
             </Col>
             <Col>
@@ -134,12 +146,12 @@ export default function ViewAllGroups() {
 
   return (
     <div>
-      <Row style={{ marginBottom: "1rem" }}>
+      <Row style={{ marginBottom: '1rem' }}>
         <Col>
           <Button
-            type="primary"
+            type='primary'
             icon={<IoMdAdd />}
-            size={"large"}
+            size={'large'}
             onClick={() => {
               setIsNewGroupModalOpen(true);
             }}
@@ -151,12 +163,12 @@ export default function ViewAllGroups() {
 
       <Row>
         <Table
-          rowClassName={() => "row"}
-          style={{ width: "100%" }}
+          rowClassName={() => 'row'}
+          style={{ width: '100%' }}
           columns={columns}
           dataSource={folders}
-         // rowSelection={rowSelection}
-          onRow={(record, rowIndex) => {
+          // rowSelection={rowSelection}
+          onRow={(record) => {
             return {
               onClick: (event) => {
                 navigate(`${record.id}`);

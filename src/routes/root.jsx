@@ -2,6 +2,9 @@ import { Layout } from 'antd';
 import { Content, Footer } from 'antd/es/layout/layout';
 import { Outlet, useLocation } from 'react-router-dom';
 import AppHeader from './AppHeader/AppHeader';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
 
 export default function Root() {
   const location = useLocation();
