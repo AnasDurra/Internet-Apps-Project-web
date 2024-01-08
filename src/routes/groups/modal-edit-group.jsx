@@ -3,6 +3,7 @@ import {
   Button,
   Col,
   Empty,
+  Flex,
   Form,
   Input,
   List,
@@ -25,10 +26,13 @@ import {
 import { useGetUsersQuery } from '../../app/services/users';
 import { useEffect, useState } from 'react';
 import { successMessage } from '../../components/messages.api';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
 
 export default function EditGroupModal({ isOpen, setOpen, folder }) {
   const [updateFolder] = useUpdateFolderMutation();
   const { data: users, isLoading } = useGetUsersQuery();
+  const [decodedToken, setDecodedToken] = useState(null);
 
   const [form] = useForm();
   const [selectedUserId, setSelectedUserId] = useState();
@@ -65,6 +69,17 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
     form.setFieldValue(['name'], folder?.name);
     updateFilteredOptions();
   }, [folder, isOpen]);
+
+  useEffect(() => {
+    const jwtToken = Cookies.get('accessToken');
+
+    try {
+      const decoded = jwtDecode(jwtToken);
+      setDecodedToken(decoded);
+    } catch (error) {
+      console.error('Error decoding JWT token:', error.message);
+    }
+  }, []);
 
   return (
     <Modal
@@ -189,38 +204,47 @@ export default function EditGroupModal({ isOpen, setOpen, folder }) {
                   }}
                   itemLayout='horizontal'
                   dataSource={currentUsers}
-                  renderItem={(item, index) => (
-                    <List.Item
-                      extra={
-                        <Button
-                          type='text'
-                          danger
-                          onClick={() => {
-                            const updatedUsers = [
-                              ...form.getFieldValue(['currentUsers']),
-                            ];
-                            updatedUsers.splice(index, 1);
-                            form.setFieldValue(['currentUsers'], updatedUsers);
-                            updateFilteredOptions();
-                          }}
-                        >
-                          Remove
-                        </Button>
-                      }
-                    >
-                      <List.Item.Meta
-                        avatar={
-                          <Avatar
-                            src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
-                          />
+                  renderItem={(item, index) => {
+                    console.log('item: ', item);
+                    console.log('decodedToken: ', decodedToken);
+
+                    return (
+                      <List.Item
+                        extra={
+                          <Button
+                            type='text'
+                            danger
+                            onClick={() => {
+                              const updatedUsers = [
+                                ...form.getFieldValue(['currentUsers']),
+                              ];
+                              updatedUsers.splice(index, 1);
+                              form.setFieldValue(
+                                ['currentUsers'],
+                                updatedUsers
+                              );
+                              updateFilteredOptions();
+                            }}
+                            disabled={item?.id == decodedToken?.sub}
+                          >
+                            {item?.id == decodedToken?.sub ? 'Owner' : 'Remove'}
+                          </Button>
                         }
-                        title={`@${item.username} (${item.full_name})`}
-                        /* description={
+                      >
+                        <List.Item.Meta
+                          avatar={
+                            <Avatar
+                              src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
+                            />
+                          }
+                          title={`@${item.username} (${item.full_name})`}
+                          /* description={
                           index == 0 ? 'owner' : null
                         } */
-                      />
-                    </List.Item>
-                  )}
+                        />
+                      </List.Item>
+                    );
+                  }}
                 />
               ) : (
                 <Empty
