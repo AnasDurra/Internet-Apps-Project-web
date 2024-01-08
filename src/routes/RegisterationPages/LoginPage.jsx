@@ -21,7 +21,7 @@ import "./style.css";
 
 import LoginImage from "../../assets/login.png";
 import cloudImage from "../../assets/cloud.png";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 const LoginPage = () => {
   const [loginMutation, { isLoading, isError, error }] = useLoginMutation();
